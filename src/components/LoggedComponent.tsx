@@ -16,7 +16,7 @@ import Swal from 'sweetalert2';
             handleLogout();
             break;
           case 'account-setting':
-            navigate('/info');
+            navigate('/profile');
             break;
           case 'my-wall':
             break;

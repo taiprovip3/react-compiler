@@ -3,6 +3,7 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import Homepage from './components/Homepage';
+import ProfileComponent from './components/ProfileComponent';
 
 const App: React.FC = () => {
   return (
@@ -10,6 +11,7 @@ const App: React.FC = () => {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Homepage />} />
+          <Route path="/profile" element={<ProfileComponent />} />
         </Routes>
       </AuthProvider>
     </Router>
