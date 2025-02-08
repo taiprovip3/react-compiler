@@ -14,6 +14,8 @@
     "antd": "^5.22.5",
     "axios": "^1.7.9",
     "babel-plugin-react-compiler": "^19.0.0-beta-201e55d-20241215",
+    "dayjs": "^1.11.13",
+    "moment": "^2.30.1",
     "react": "^19.0.0-rc.1",
     "react-dom": "^19.0.0-rc.1",
     "react-router-dom": "^7.1.2",

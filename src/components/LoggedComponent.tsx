@@ -1,7 +1,7 @@
 import React from 'react';
 import { Badge, Button, Dropdown, MenuProps } from 'antd';
 import { BellOutlined, DownOutlined, LogoutOutlined, ProductOutlined, UserOutlined } from '@ant-design/icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import Swal from 'sweetalert2';
 
@@ -78,7 +78,7 @@ import Swal from 'sweetalert2';
     return (
       <div style={{ border: '1px solid lime', paddingRight: '15px', textWrap: 'wrap', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
         <Dropdown menu={{ items, onClick }} trigger={['hover']} placement="bottomLeft">
-            <Button onClick={(e) => e.preventDefault()} type="text" style={{ color: 'white' }} icon={<UserOutlined />}>{userData.user.username}<DownOutlined /></Button>
+            <Button onClick={(e) => e.preventDefault()} type="text" style={{ color: 'white' }} icon={<UserOutlined />}>{userData?.user.username}<DownOutlined /></Button>
         </Dropdown>
         <Badge size='small' count={itemCount} offset={[-1, -2]}>
             <BellOutlined style={{ color: 'white', fontSize: '18px', cursor: 'pointer' }} />

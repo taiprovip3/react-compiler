@@ -2,26 +2,11 @@ import React, { ReactNode } from 'react'
 import { createContext } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { userApi } from '../api';
-
-interface UserData {
-  // "id": number,
-  // "fullName": string,
-  // "phoneNumber": string,
-  // "phoneCode": string,
-  // "gender": string,
-  // "dateOfBirth": string,
-  // "balance": number,
-  // "createdAt": string,
-  // "updatedAt": string,
-  // "defaultAddress": string,
-  // "avatar": string,
-  // "addresses": Array<any>,
-  // [key: string]: any; // Cho phép các thuộc tính bổ sung nếu cần
-}
+import { Profile } from '../types/Profiles';
 
 // Định nghĩa interface cho giá trị của AuthContext
 interface AuthContextType {
-  userData: any;
+  userData: Profile | null;
   setUserData: React.Dispatch<React.SetStateAction<any>>;
   validateUserAuthentication: () => Promise<void>;
 }
@@ -38,7 +23,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider:React.FC<AuthProviderProps> = ({ children }) => {
-  const [userData, setUserData] = React.useState<any>(null);
+  const [userData, setUserData] = React.useState<Profile | null>(null);
   const navigate = useNavigate();
 
   const validateUserAuthentication = async () => {

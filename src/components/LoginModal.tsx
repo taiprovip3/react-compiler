@@ -80,12 +80,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onRegister })
           <Form.Item
             name="username"
             rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập!' }]}
+            initialValue={'user02'}
           >
             <Input placeholder="Tên đăng nhập" ref={(input) => (usernameInputRef.current = input?.input || null)} />
           </Form.Item>
           <Form.Item
             name="password"
             rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+            initialValue={'123123az'}
           >
             <Input.Password placeholder="Mật khẩu" />
           </Form.Item>

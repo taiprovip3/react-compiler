@@ -1,9 +1,7 @@
-// import { useState } from 'react'
-// import './App.css'
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import Homepage from './components/Homepage';
-import ProfileComponent from './components/ProfileComponent';
+import Homepage from './pages/Home/Homepage';
+import Profilepage from './pages/Profile/Profilepage';
 
 const App: React.FC = () => {
   return (
@@ -11,7 +9,7 @@ const App: React.FC = () => {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Homepage />} />
-          <Route path="/profile" element={<ProfileComponent />} />
+          <Route path="/profile" element={<Profilepage />} />
         </Routes>
       </AuthProvider>
     </Router>

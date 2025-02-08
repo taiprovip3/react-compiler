@@ -1,6 +1,7 @@
+import { Profile } from '../types/Profiles';
 import http from './http';
 
-export const getUserProfile = async () => {
+export const getUserProfile = async (): Promise<Profile> => {
   const response = await http.get('/profiles/');
   return response.data;
 };

@@ -1,11 +1,12 @@
 import React from 'react';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, MenuProps } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
 import { AuthContext } from '../contexts/AuthContext';
 import LoggedComponent from './LoggedComponent';
+import { useNavigate } from 'react-router-dom';
 
 const { Header } = Layout;
 
@@ -25,13 +26,23 @@ const LoginDiv = styled.div`
 `;
 
 const AppHeader: React.FC = () => {
-  console.log('AppHeader rerender');
   
   const [isLoginModalVisible, setLoginModalVisible] = React.useState<boolean>(false);
   const [isRegisterModalVisible, setRegisterModalVisible] = React.useState<boolean>(false);
   const { userData } = React.useContext(AuthContext);
   console.log('userData=', userData);
+  const navigate = useNavigate();
   
+  const onClick: MenuProps['onClick'] = ({ key }) => {
+    switch (key) {
+      case 'Homepage':
+        navigate('/');
+        break;
+      default:
+        break;
+    }
+  }
+
   const items = [
     {key: 'Homepage', label: 'Home'}, {key: 'Walls', label: 'Walls'}, {key: 'Contact', label: 'Contact'}
   ]
@@ -57,7 +68,7 @@ const AppHeader: React.FC = () => {
     <Header
         style={{position: 'sticky', top: 0, zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 0, border: '1px solid red'}}
     >
-      <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']} style={{ width: '100%', maxWidth: '50%', border: '1px solid blue' }} items={items} />
+      <Menu defaultSelectedKeys={['1']} items={items} onClick={onClick} theme="dark" mode="horizontal" style={{ width: '100%', maxWidth: '50%', border: '1px solid blue' }} />
 
       <div style={{ maxWidth: '100%', textAlign: 'center', lineHeight: '1em', textWrap: 'wrap', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', border: '1px solid yellow' }}>
         <div className="logo" style={{  }}>
