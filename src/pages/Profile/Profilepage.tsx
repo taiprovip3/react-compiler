@@ -111,7 +111,7 @@ const Profilepage: React.FC = () => {
       setDateOfBirthInputStatus("error");
       errors.push("Ngày sinh không hợp lệ");
     } else {
-      const age = moment().diff(moment(dateOfBirth.$d), "years");
+      const age = moment().diff(moment(dateOfBirth._i), "years");
       console.log("age =", age);
       if(age < 14) {
         setDateOfBirthInputStatus("error");
