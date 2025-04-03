@@ -8,8 +8,10 @@ export class User {
     id: number;
     @Column({ unique: true })
     username: string;
-    @Column({ unique: true })
+    @Column({ unique: true, nullable: true })
     email: string;
+    @Column()
+    password: string;
     @OneToMany(() => Token, (token) => token.user, { cascade: true })
     tokens: Token[];
     @Column({ name: "is_disabled", default: false })
