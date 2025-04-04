@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -8,9 +9,11 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import * as dotenv from 'dotenv';
 import { TokenService } from 'src/token/token.service';
 import { RegisterDto } from './dto/register.dto';
 
+dotenv.config();
 @Injectable()
 export class AuthService {
   constructor(
@@ -54,7 +57,9 @@ export class AuthService {
 
   async refreshToken(refreshTokenFromUser: string) {
     // const payload = this.jwtService.decode(refreshTokenFromUser);
-    const payload = this.jwtService.decode(refreshTokenFromUser);
+    const payload = this.jwtService.verify(refreshTokenFromUser, {
+      secret: process.env.REFRESH_SECRET,
+    });
 
     // Validate payload decoded from refresh token
     if (!payload || typeof payload !== 'object' || !payload.sub)
@@ -78,7 +83,7 @@ export class AuthService {
       tokenEntity.value,
     );
     if (!isRefreshToValidHashed)
-      throw new UnauthorizedException(
+      throw new ForbiddenException(
         'Refesh token is not a valid hashed compare!',
       );
 

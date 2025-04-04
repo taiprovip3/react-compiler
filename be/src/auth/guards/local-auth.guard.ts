@@ -23,7 +23,9 @@ export class LocalAuthGuard extends AuthGuard('local') {
     status?: any,
   ): TUser {
     if (err || !user) {
-      throw new UnauthorizedException('Invalid credentials nhee!');
+      throw new UnauthorizedException(
+        '[LocalAuthGuard]: Invalid credentials nhé!',
+      );
     }
     return user;
   }

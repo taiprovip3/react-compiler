@@ -5,24 +5,41 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Authority } from 'src/entities/authority.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(Authority)
+    private authorityRepository: Repository<Authority>,
   ) {}
 
   async findByUsername(username: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { username } });
   }
 
+  async findById(userId: number): Promise<User | null> {
+    return this.usersRepository.findOneBy({ id: userId });
+  }
+
   async create(createUserDto: CreateUserDto): Promise<User> {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const newUser = this.usersRepository.create({
-      ...createUserDto,
-      password: hashedPassword,
+    const user = new User();
+    user.username = createUserDto.username;
+    user.password = hashedPassword;
+    user.email = createUserDto.email ?? '';
+    const authority = await this.authorityRepository.findOne({
+      where: { authority: 'ROLE_USER' },
     });
-    return this.usersRepository.save(newUser);
+    user.authorities = authority ? [authority] : [];
+    // user.authorities = authority;
+    // const newUser = this.usersRepository.create({
+    //   ...createUserDto,
+    //   password: hashedPassword,
+    //   authorities: [this.authorityRepository.findOne({ where: {authority: 'ROLE_USER'} })],
+    // });
+    return this.usersRepository.save(user);
   }
 
   async findAll(): Promise<User[]> {
