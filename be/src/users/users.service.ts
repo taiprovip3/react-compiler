@@ -6,6 +6,8 @@ import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Authority } from 'src/entities/authority.entity';
+import { Profile } from 'src/entities/profile.entity';
+import { profile } from 'console';
 
 @Injectable()
 export class UsersService {
@@ -33,12 +35,6 @@ export class UsersService {
       where: { authority: 'ROLE_USER' },
     });
     user.authorities = authority ? [authority] : [];
-    // user.authorities = authority;
-    // const newUser = this.usersRepository.create({
-    //   ...createUserDto,
-    //   password: hashedPassword,
-    //   authorities: [this.authorityRepository.findOne({ where: {authority: 'ROLE_USER'} })],
-    // });
     return this.usersRepository.save(user);
   }
 

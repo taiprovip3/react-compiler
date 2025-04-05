@@ -47,6 +47,7 @@ export class Profile {
 
   @OneToMany(() => Address, (address) => address.profile, { cascade: true })
   addresses: Address[];
+
   @OneToOne(() => User, { cascade: true })
   @JoinColumn({ name: 'user_id' })
   user: User;

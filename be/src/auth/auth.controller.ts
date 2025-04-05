@@ -60,18 +60,24 @@ export class AuthController {
 
   /**
    * Để logout thành công thì request đó cần đính kèm accessToken vào bearer header
-   * @param req 
-   * @param res 
-   * @returns 
+   * @param req
+   * @param res
+   * @returns
    */
   @Post('logout')
   @UseGuards(JwtAuthGuard)
-  logout(@Req() req: ExpressRequest, @Res({ passthrough: true }) res: Response) {
+  logout(
+    @Req() req: ExpressRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const refreshToken: string = req.cookies?.refreshToken;
-    if(!refreshToken) {
-      throw new HttpException('No refresh token found in cookies. You are not logged in!', HttpStatus.UNAUTHORIZED);
+    if (!refreshToken) {
+      throw new HttpException(
+        'No refresh token found in cookies. You are not logged in!',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
-    
+
     const user = req.user;
     console.log('User logging out:', user);
     res.clearCookie('refreshToken', { path: '/' });

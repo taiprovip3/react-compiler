@@ -1,4 +1,6 @@
-export default {
+import { DataSource } from 'typeorm';
+
+const AppDataSource = new DataSource({
   type: 'mysql',
   host: 'localhost',
   port: 3306,
@@ -6,9 +8,8 @@ export default {
   password: '',
   database: 'blog_db',
   entities: ['dist/**/*.entity.js'],
-  synchronize: true,
   migrations: ['dist/migrations/*.js'],
-  cli: {
-    migrationsDir: 'src/migrations',
-  },
-};
+  migrationsTableName: 'custom_migration_table',
+});
+
+export default AppDataSource;
