@@ -8,6 +8,8 @@ import {
   Req,
   Res,
   UseGuards,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -15,6 +17,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Request as ExpressRequest, Response } from 'express';
 import { RtGuard } from './guards/rt.guard';
 import { User } from 'src/entities/user.entity';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -42,7 +45,7 @@ export class AuthController {
       httpOnly: true,
       secure: true,
       sameSite: 'lax',
-      path: '/auth/refresh-token',
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return { accessToken };
@@ -53,5 +56,25 @@ export class AuthController {
   async refresh(@Req() req: ExpressRequest) {
     const refreshToken: string = req.cookies['refreshToken'];
     return this.authService.refreshToken(refreshToken);
+  }
+
+  /**
+   * Để logout thành công thì request đó cần đính kèm accessToken vào bearer header
+   * @param req 
+   * @param res 
+   * @returns 
+   */
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  logout(@Req() req: ExpressRequest, @Res({ passthrough: true }) res: Response) {
+    const refreshToken: string = req.cookies?.refreshToken;
+    if(!refreshToken) {
+      throw new HttpException('No refresh token found in cookies. You are not logged in!', HttpStatus.UNAUTHORIZED);
+    }
+    
+    const user = req.user;
+    console.log('User logging out:', user);
+    res.clearCookie('refreshToken', { path: '/' });
+    return { message: 'Logged out!' };
   }
 }
