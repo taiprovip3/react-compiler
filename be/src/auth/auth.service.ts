@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/users/users.service';
+import { UserService } from 'src/users/user.service';
 import { User } from 'src/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import * as dotenv from 'dotenv';
@@ -17,13 +17,13 @@ dotenv.config();
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
+    private userService: UserService,
     private jwtService: JwtService,
     private tokenService: TokenService,
   ) {}
 
   async validateUser(username: string, pass: string): Promise<Partial<User>> {
-    const user = await this.usersService.findByUsername(username);
+    const user = await this.userService.findByUsername(username);
     if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
       return result;
@@ -33,13 +33,13 @@ export class AuthService {
 
   async register(registerDto: RegisterDto): Promise<User> {
     const { username } = registerDto;
-    const existingUser = await this.usersService.findByUsername(username);
+    const existingUser = await this.userService.findByUsername(username);
     if (!existingUser) {
       const createUserDto = {
         username: registerDto.username,
         password: registerDto.password,
       };
-      return this.usersService.create(createUserDto);
+      return this.userService.create(createUserDto);
     }
     throw new ConflictException(`Username ${username} already exists!`);
   }

@@ -4,21 +4,26 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { GetUser } from 'src/decorators/get-user.decorator';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { User } from 'src/entities/user.entity';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+export class UserController {
+  constructor(private readonly userService: UserService) {}
 
   @Get('admin')
   @Roles('ROLE_ADMIN')
@@ -34,26 +39,35 @@ export class UsersController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    return this.userService.create(createUserDto);
   }
 
   @Get()
   async findAll() {
-    return this.usersService.findAll();
+    return this.userService.findAll();
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.userService.findOne(+id);
   }
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.userService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.userService.remove(+id);
+  }
+
+  @Patch('change-password')
+  @UseGuards(AuthGuard('jwt'))
+  changePassword(
+    @GetUser() user: User,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return this.userService.changePassword(user.id, changePasswordDto);
   }
 }
