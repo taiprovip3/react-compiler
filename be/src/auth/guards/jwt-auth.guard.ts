@@ -23,7 +23,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     status?: any,
   ): TUser {
     if (err || !user) {
-      throw new UnauthorizedException('[JwtAuthGuard]: Unauthorized nhé!');
+      if (info?.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('[JwtAuthGuard] Token đã hết hạn!');
+      }
+
+      if (info?.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('[JwtAuthGuard] Token không hợp lệ!');
+      }
+
+      // fallback
+      throw new UnauthorizedException(
+        '[JwtAuthGuard] Không tìm thấy đính kèm token. Xác thực thất bại!',
+      );
     }
     return user;
   }

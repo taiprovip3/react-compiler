@@ -5,12 +5,14 @@ import {
   JoinTable,
   ManyToMany,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Token } from './token.entity';
 import { Authority } from './authority.entity';
 import { Exclude } from 'class-transformer';
+import { Profile } from './profile.entity';
 
 @Entity()
 export class User {
@@ -44,4 +46,7 @@ export class User {
   createdAt: Date;
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
   updatedAt: Date;
+
+  @OneToOne(() => Profile, (profile) => profile.user)
+  profile: Profile;
 }

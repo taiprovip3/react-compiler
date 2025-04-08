@@ -9,12 +9,7 @@ import {
 } from 'typeorm';
 import { Address } from './address.entity';
 import { User } from './user.entity';
-
-export enum GenderType {
-  MALE = 'Male',
-  FEMALE = 'Female',
-  OTHER = 'Others',
-}
+import { GenderType } from 'src/enums/gender.enum';
 
 @Entity()
 export class Profile {
@@ -26,7 +21,7 @@ export class Profile {
   phoneNumber: string;
   @Column({ name: 'phone_code', default: '+84' })
   phoneCode: string;
-  @Column({ type: 'enum', enum: GenderType })
+  @Column({ type: 'enum', enum: GenderType, nullable: true })
   gender: GenderType;
   @Column({ name: 'date_of_birth', type: 'timestamp', nullable: true })
   dateOfBirth: Date;

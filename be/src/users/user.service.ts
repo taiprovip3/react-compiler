@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -7,6 +11,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Authority } from 'src/entities/authority.entity';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { Profile } from 'src/entities/profile.entity';
 
 @Injectable()
 export class UserService {
@@ -14,6 +20,7 @@ export class UserService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Authority)
     private authorityRepository: Repository<Authority>,
+    @InjectRepository(Profile) private profileRepository: Repository<Profile>,
   ) {}
 
   async findByUsername(username: string): Promise<User | null> {
@@ -72,5 +79,39 @@ export class UserService {
     await this.userRepository.save(user);
 
     return { message: 'Đổi mật khẩu thành công' };
+  }
+
+  async updateProfile(userId: number, updateProfileDto: UpdateProfileDto) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['profile'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('Không tìm thấy người dùng');
+    }
+
+    let profile = user.profile;
+
+    if (!user.profile) {
+      console.info(`User ${user.username} has no profile yet. Created one..!`);
+      profile = this.profileRepository.create({
+        user: user,
+        balance: 0, // hoặc để mặc định trong entity
+      });
+    }
+
+    profile.fullname = updateProfileDto.fullname ?? profile.fullname;
+    profile.phoneNumber = updateProfileDto.phoneNumber ?? profile.phoneNumber;
+    profile.gender = updateProfileDto.gender ?? profile.gender;
+    profile.dateOfBirth = updateProfileDto.dateOfBirth
+      ? new Date(updateProfileDto.dateOfBirth)
+      : profile.dateOfBirth;
+
+    await this.profileRepository.save(profile);
+    return {
+      message: 'Cập nhật hồ sơ thành công',
+      profile,
+    };
   }
 }
