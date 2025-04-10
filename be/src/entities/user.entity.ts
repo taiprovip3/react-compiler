@@ -22,6 +22,8 @@ export class User {
   username: string;
   @Column({ unique: true, nullable: true })
   email: string;
+  @Column({ name: 'is_email_verified', default: false })
+  isEmailVerified: boolean;
   @Column()
   @Exclude()
   password: string;

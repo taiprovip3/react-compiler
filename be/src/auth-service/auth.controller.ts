@@ -16,7 +16,6 @@ import { RegisterDto } from './dto/register.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Request as ExpressRequest, Response } from 'express';
 import { RtGuard } from './guards/rt.guard';
-import { User } from 'src/entities/user.entity';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
@@ -71,6 +70,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const refreshToken: string = req.cookies?.refreshToken;
+    console.log('refreshToken=', refreshToken);
     if (!refreshToken) {
       throw new HttpException(
         'No refresh token found in cookies. You are not logged in!',

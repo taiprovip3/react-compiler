@@ -3,11 +3,21 @@ import { Modal, Button, Form, Input, Checkbox } from 'antd';
 import { AuthContext } from '../contexts/AuthContext';
 import Swal from 'sweetalert2';
 import { authApi, userApi } from '../api';
+import { jwtDecode } from 'jwt-decode';
 
 interface LoginModalProps {
   visible: boolean;
   onClose: () => void;
   onRegister: () => void;
+}
+
+interface JwtPayload {
+  sub: number;        // userId
+  username: string;
+  role?: string;
+  exp: number;
+  iat: number;
+  [key: string]: any;
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onRegister }) => {
@@ -17,21 +27,35 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onRegister })
   const usernameInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const handleLogin = () => {
-    form.validateFields().then(async (values) => {
+    form.validateFields().then(async (values: { username: string; password: string; }) => {
       console.log('Login values:', values);
       setLoading(true);
       try {
         const loginResponse = await authApi.login(values.username, values.password);
   
-        if (loginResponse.isLogged) {
-          sessionStorage.setItem('accessToken', loginResponse.accessToken);
-          sessionStorage.setItem('refreshToken', loginResponse.refreshToken);
-          const profileResponse = await userApi.getUserProfile(); // Gọi API lấy thông tin người dùng
-          if(profileResponse) {
-            setUserData(profileResponse);
-            console.log('Thông tin người dùng:', profileResponse);
-            onClose();
+        if (loginResponse.accessToken) {
+          const accessToken = loginResponse.accessToken;
+          const decoded = jwtDecode<JwtPayload>(accessToken);
+          const userId = decoded.sub;
+          sessionStorage.setItem('accessToken', accessToken);
+          sessionStorage.setItem('userId', userId.toString());
+          
+          const userDataResponse = await userApi.getUserData(userId); // Gọi API lấy thông tin người dùng
+          console.log('userDataResponse=', userDataResponse);
+          setUserData(userDataResponse);
+          onClose();
+          if(userDataResponse) {
+            console.log('Thông tin người dùng:', userDataResponse);
+          } else {
+            console.info(`User ${values.username} chỉ vừa mới tạo acc. Chưa có profile!`)
           }
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Something went wrong. No access token return from server!',
+            icon: 'error',
+            confirmButtonText: 'Oops!'
+          });
         }
       } catch (error: any) {
         console.error('error=', error);

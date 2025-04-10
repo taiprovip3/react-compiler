@@ -13,6 +13,7 @@ import { Authority } from 'src/entities/authority.entity';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Profile } from 'src/entities/profile.entity';
+import { MinioService } from 'src/core/minio/minio.service';
 
 @Injectable()
 export class UserService {
@@ -21,6 +22,7 @@ export class UserService {
     @InjectRepository(Authority)
     private authorityRepository: Repository<Authority>,
     @InjectRepository(Profile) private profileRepository: Repository<Profile>,
+    private minioService: MinioService,
   ) {}
 
   async findByUsername(username: string): Promise<User | null> {
@@ -49,7 +51,10 @@ export class UserService {
   }
 
   async findOne(id: number): Promise<User | null> {
-    return this.userRepository.findOne({ where: { id } });
+    return this.userRepository.findOne({
+      where: { id },
+      relations: ['profile'],
+    });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User | null> {
@@ -81,6 +86,19 @@ export class UserService {
     return { message: 'Đổi mật khẩu thành công' };
   }
 
+  async getProfile(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['profile'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('Không tìm thấy người dùng');
+    }
+
+    return user.profile;
+  }
+
   async updateProfile(userId: number, updateProfileDto: UpdateProfileDto) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
@@ -91,12 +109,39 @@ export class UserService {
       throw new NotFoundException('Không tìm thấy người dùng');
     }
 
-    let profile = user.profile;
+    // TH1: ko sendVerification + giữ nguyên email - ko làm gì cả
+    // TH2: ko sendVerification + change email -> tiến hành update mail *
+    // TH3: sendVerification + giữ nguyên email -> tiến hành sendmail
+    // TH4: sendVerification + change email -> tiến hành update mail + sendmail *
+    // TH5: isVerification = true; -> ko làm gì cả
+    if (user.isEmailVerified) {
+      // ko làm gì cả
+    }
+    if (!user.isEmailVerified && updateProfileDto.email !== user.email) {
+      // Nếu account chưa verified email và user đổi email so với trước đó
+      user.email = updateProfileDto.email ?? user.email;
+      await this.userRepository.save(user);
+      if (updateProfileDto.sendVerification) {
+        // Nếu user muốn verify email
+        // send email verification function here...
+        console.log(
+          `1. We sent an email verification to ${updateProfileDto.email}. Please check!`,
+        );
+      }
+    } else {
+      // Nếu account chưa verify và email ko change -> nhưng check verify
+      if (updateProfileDto.sendVerification) {
+        // Nếu user muốn verify email
+        // send email verification function here...
+        console.log(
+          `2. We sent an email verification to ${updateProfileDto.email}. Please check!`,
+        );
+      }
+    }
 
+    let profile = user.profile;
     if (!user.profile) {
-      console.info(`User ${user.username} has no profile yet. Created one..!`);
       profile = this.profileRepository.create({
-        user: user,
         balance: 0, // hoặc để mặc định trong entity
       });
     }
@@ -113,5 +158,26 @@ export class UserService {
       message: 'Cập nhật hồ sơ thành công',
       profile,
     };
+  }
+
+  async updateAvatar(userId: number, avatarUrl: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['profile'],
+    });
+
+    if (!user) throw new NotFoundException('User không tồn tại!');
+
+    let profile = user.profile;
+    if (!profile) {
+      profile = this.profileRepository.create({ user });
+    } else {
+      if (profile.avatar && !profile.avatar.includes('icons8.com')) {
+        await this.minioService.deleteAvatarByUrl(profile.avatar);
+      }
+    }
+
+    profile.avatar = avatarUrl;
+    await this.profileRepository.save(profile);
   }
 }

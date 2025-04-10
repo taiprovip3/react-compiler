@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const http = axios.create({
-    baseURL: 'http://localhost:8080/api',
+    baseURL: apiUrl,
     withCredentials: true,
     timeout: 10000,
 });
@@ -18,7 +20,7 @@ http.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            console.error('Unauthorized! Redirect to login.'); // Tự xử lý khi không được phép (401)
+            console.error('Server return 401-Unauthorized!'); // Tự xử lý khi không được phép (401)
         }
         return Promise.reject(error);
     }

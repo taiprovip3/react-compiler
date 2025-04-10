@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { UsersModule } from 'src/users/user.module';
 import * as dotenv from 'dotenv';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './strategies/local.strategy';
-import { TokenModule } from 'src/token/token.module';
+import { TokenModule } from 'src/token-service/token.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { UserModule } from 'src/user-service/user.module';
 
 dotenv.config();
 
 @Module({
   imports: [
-    UsersModule,
+    UserModule,
     TokenModule,
     PassportModule,
     JwtModule.register({

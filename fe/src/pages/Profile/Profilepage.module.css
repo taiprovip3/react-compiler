@@ -1,0 +1,14 @@
+@media (max-width: 768px) {
+    .responsiveSelect {
+        width: 100% !important;
+    }
+}
+
+.responsiveSelect {
+    width: 200;
+    color: aquamarine;
+}
+
+.error {
+    background-color: blue;
+}

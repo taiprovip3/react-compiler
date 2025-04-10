@@ -30,7 +30,6 @@ const AppHeader: React.FC = () => {
   const [isLoginModalVisible, setLoginModalVisible] = React.useState<boolean>(false);
   const [isRegisterModalVisible, setRegisterModalVisible] = React.useState<boolean>(false);
   const { userData } = React.useContext(AuthContext);
-  console.log('userData=', userData);
   const navigate = useNavigate();
   
   const onClick: MenuProps['onClick'] = ({ key }) => {

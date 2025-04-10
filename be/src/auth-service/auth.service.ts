@@ -6,11 +6,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from 'src/users/user.service';
+import { UserService } from 'src/user-service/user.service';
 import { User } from 'src/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import * as dotenv from 'dotenv';
-import { TokenService } from 'src/token/token.service';
+import { TokenService } from 'src/token-service/token.service';
 import { RegisterDto } from './dto/register.dto';
 
 dotenv.config();

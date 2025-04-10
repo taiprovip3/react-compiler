@@ -2,11 +2,11 @@ import React, { ReactNode } from 'react'
 import { createContext } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { userApi } from '../api';
-import { Profile } from '../types/Profiles';
+import { User } from '../types/User';
 
 // Định nghĩa interface cho giá trị của AuthContext
 interface AuthContextType {
-  userData: Profile | null;
+  userData: User | null;
   setUserData: React.Dispatch<React.SetStateAction<any>>;
   validateUserAuthentication: () => Promise<void>;
 }
@@ -23,17 +23,25 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider:React.FC<AuthProviderProps> = ({ children }) => {
-  const [userData, setUserData] = React.useState<Profile | null>(null);
+  const [userData, setUserData] = React.useState<User | null>(null);
   const navigate = useNavigate();
 
   const validateUserAuthentication = async () => {
     if(!userData) {
       try {
-        const userProfile = await userApi.getUserProfile();
-        if(!userProfile) {
+        const userId = sessionStorage.getItem('userId');
+        if(!userId) {
+          console.info('No saved credentials found. It"s a fresh page!');
+          return;
+        }
+        console.log('validateUserAuthentication call api getUserData()!');
+        
+        const userDataResponse = await userApi.getUserData(Number(userId));
+        if(!userDataResponse) {
           console.error('Init can"t get user profile. Something went wrong!');
         }
-        setUserData(userProfile);
+        setUserData(userDataResponse);
+        console.log('userDataResponse=', userDataResponse);
       } catch (error: any) {
         console.error(error);
         if(error.code === 'ERR_BAD_REQUEST') {

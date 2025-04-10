@@ -1,6 +1,5 @@
 import { DataSource } from 'typeorm';
 import 'dotenv/config';
-import { User } from 'src/entities/user.entity';
 // import các entity khác nếu có
 
 export const AppDataSource = new DataSource({

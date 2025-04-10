@@ -5,11 +5,12 @@ import { UserService } from './user.service';
 import { User } from 'src/entities/user.entity';
 import { Authority } from 'src/entities/authority.entity';
 import { Profile } from 'src/entities/profile.entity';
+import { MinioService } from 'src/core/minio/minio.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Authority, Profile])],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, MinioService],
   exports: [UserService],
 })
-export class UsersModule {}
+export class UserModule {}

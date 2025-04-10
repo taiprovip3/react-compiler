@@ -3,7 +3,7 @@ import { User } from "./User";
 
 export interface Profile {
     id: number;
-    fullName?: string;
+    fullname?: string;
     phoneNumber?: string;
     phoneCode: string;
     gender?: string;
