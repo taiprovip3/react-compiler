@@ -5,7 +5,7 @@ import { AuthContext } from "../../contexts/AuthContext"; // Context chứa user
 import AppHeader from "../../components/Header";
 import AppFooter from "../../components/Footer";
 import moment from "moment";
-import styles from './Profilepage.module.css';
+import styles from './ProfilePage.module.css';
 import { userApi } from "../../api";
 import Swal from "sweetalert2";
 
@@ -21,7 +21,7 @@ const StyledContent = styled(Content)`
   gap: 24px;
 `;
 
-const Profilepage: React.FC = () => {
+const ProfilePage: React.FC = () => {
   const { userData } = useContext(AuthContext); // Lấy userData từ AuthContext
   const [selectedMenu, setSelectedMenu] = useState("profile");
   const [form] = Form.useForm();
@@ -43,7 +43,7 @@ const Profilepage: React.FC = () => {
     if(userData?.isEmailVerified) {
       return <>
       <Space.Compact style={{ width: '100%', alignItems: 'center' }}>
-        <Form.Item name="email" label="Email ✅" style={{ width: '90%' }}>
+        <Form.Item name="email" label="Email (verified ✅✨)" style={{ width: '90%' }}>
           <Input disabled />
         </Form.Item>
         <Button color="danger" variant="text">Change</Button>
@@ -178,7 +178,6 @@ const Profilepage: React.FC = () => {
     }
     
     const responseUpdateProfile = await userApi.updateUserProfile(userData!.id, resultObject);
-    console.log('responseUpdateProfile=', responseUpdateProfile);
     Swal.fire({
       title: "Update Profile",
       text: responseUpdateProfile.message,
@@ -381,4 +380,4 @@ const Profilepage: React.FC = () => {
   );
 };
 
-export default Profilepage;
+export default ProfilePage;

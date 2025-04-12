@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -14,6 +16,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Profile } from 'src/entities/profile.entity';
 import { MinioService } from 'src/core/minio/minio.service';
+import { AuthService } from 'src/auth-service/auth.service';
 
 @Injectable()
 export class UserService {
@@ -23,6 +26,8 @@ export class UserService {
     private authorityRepository: Repository<Authority>,
     @InjectRepository(Profile) private profileRepository: Repository<Profile>,
     private minioService: MinioService,
+    @Inject(forwardRef(() => AuthService))
+    private authService: AuthService,
   ) {}
 
   async findByUsername(username: string): Promise<User | null> {
@@ -57,9 +62,26 @@ export class UserService {
     });
   }
 
+  async findOneByEmailVerificationToken(token: string): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: { emailVerificationToken: token },
+    });
+  }
+
+  async verifyUserEmail(user: User): Promise<User> {
+    user.isEmailVerified = true;
+    user.emailVerificationToken = '';
+    return await this.userRepository.save(user);
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User | null> {
+    // Hàm tào lao, làm gì có TH nào update mà chỉ update những field trong updateUserDto.
     await this.userRepository.update(id, updateUserDto);
     return this.findOne(id);
+  }
+
+  async save(user: User) {
+    return await this.userRepository.save(user);
   }
 
   async remove(id: number): Promise<void> {
@@ -127,6 +149,7 @@ export class UserService {
         console.log(
           `1. We sent an email verification to ${updateProfileDto.email}. Please check!`,
         );
+        this.authService.sendEmailVerification(userId, user.email);
       }
     } else {
       // Nếu account chưa verify và email ko change -> nhưng check verify
@@ -136,6 +159,7 @@ export class UserService {
         console.log(
           `2. We sent an email verification to ${updateProfileDto.email}. Please check!`,
         );
+        this.authService.sendEmailVerification(userId, user.email);
       }
     }
 

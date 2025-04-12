@@ -1,16 +1,18 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import Homepage from './pages/Home/Homepage';
-import Profilepage from './pages/Profile/Profilepage';
 import ProtectedRoute from './components/ProtectedRoute';
+import HomePage from './pages/Home/HomePage';
+import ProfilePage from './pages/Profile/ProfilePage';
+import VerifyEmailPage from './pages/VerifyEmail/VerifyEmailPage';
 
 const App: React.FC = () => {
   return (
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/profile" element={<ProtectedRoute><Profilepage /></ProtectedRoute>} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
         </Routes>
       </AuthProvider>
     </Router>

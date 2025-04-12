@@ -1,6 +1,8 @@
 import {
   ConflictException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -12,14 +14,19 @@ import * as bcrypt from 'bcrypt';
 import * as dotenv from 'dotenv';
 import { TokenService } from 'src/token-service/token.service';
 import { RegisterDto } from './dto/register.dto';
+import { ConfigService } from '@nestjs/config';
+import { MailService } from 'src/core/mail/mail.service';
 
 dotenv.config();
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UserService,
-    private jwtService: JwtService,
-    private tokenService: TokenService,
+    @Inject(forwardRef(() => UserService))
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+    private readonly tokenService: TokenService,
+    private readonly configService: ConfigService,
+    private readonly mailService: MailService,
   ) {}
 
   async validateUser(username: string, pass: string): Promise<Partial<User>> {
@@ -46,9 +53,14 @@ export class AuthService {
 
   async login(user: User) {
     const payload = { username: user.username, sub: user.id };
-    const accessToken = this.jwtService.sign(payload);
+    const secretKey = this.configService.get('JWT_SECRET');
+    const refreshSecret = this.configService.get('REFRESH_SECRET');
+    const accessToken = this.jwtService.sign(payload, {
+      secret: secretKey,
+      expiresIn: '1h',
+    });
     const refreshToken = this.jwtService.sign(payload, {
-      secret: process.env.REFRESH_SECRET,
+      secret: refreshSecret,
       expiresIn: '7d',
     });
     await this.tokenService.saveRefreshToken(user, refreshToken);
@@ -56,9 +68,8 @@ export class AuthService {
   }
 
   async refreshToken(refreshTokenFromUser: string) {
-    // const payload = this.jwtService.decode(refreshTokenFromUser);
     const payload = this.jwtService.verify(refreshTokenFromUser, {
-      secret: process.env.REFRESH_SECRET,
+      secret: this.configService.get('REFRESH_SECRET'),
     });
 
     // Validate payload decoded from refresh token
@@ -91,7 +102,58 @@ export class AuthService {
       username: tokenEntity.user.username,
       sub: tokenEntity.user.id,
     };
-    const newAccessToken = this.jwtService.sign(newPayload);
+    const newAccessToken = this.jwtService.sign(newPayload, {
+      secret: this.configService.get('JWT_SECRET'),
+    });
     return { accessToken: newAccessToken };
+  }
+
+  async sendEmailVerification(
+    userId: number,
+    userEmail: string,
+  ): Promise<void> {
+    const user = await this.userService.findOne(userId);
+    if (!user) throw new NotFoundException(`User id-${userId} not found!`);
+    const payload = { username: user.username, sub: userId };
+    const token = this.jwtService.sign(payload, {
+      secret: this.configService.get('JWT_SECRET'),
+      expiresIn: '15d',
+    });
+    user.emailVerificationToken = token;
+    await this.userService.save(user);
+    await this.mailService.sendEmailVerification(userEmail, token);
+  }
+
+  async verifyEmail(token: string) {
+    const user = await this.userService.findOneByEmailVerificationToken(token);
+    if (!user) {
+      throw new NotFoundException('Không tìm thấy User nào có token này!');
+    }
+    if (user.isEmailVerified) {
+      throw new NotFoundException(
+        'This account has verified email done before! Can"t do this again!',
+      );
+    }
+    // Validate token expired here...
+    try {
+      const payload = await this.jwtService.verify(token, {
+        secret: this.configService.get('JWT_SECRET'),
+      });
+      if (Date.now() >= payload.exp * 1000) {
+        throw new UnauthorizedException(
+          '1. Token đã hết hạn, vui lòng yêu cầu gửi lại email xác thực.',
+        );
+      }
+      await this.userService.verifyUserEmail(user);
+      return { message: 'Email đã được xác thực thành công! Chúc mừng.' };
+    } catch (error) {
+      console.error('error=', error);
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException(
+          '2. Token đã hết hạn, vui lòng yêu cầu gửi lại email xác thực.',
+        );
+      }
+      throw new UnauthorizedException('Token không hợp lệ.');
+    }
   }
 }

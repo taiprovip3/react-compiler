@@ -1,0 +1,23 @@
+.centerBoard {
+    background-color: rgb(232, 232, 232);
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    padding: 25px;
+    border-radius: 7px;
+    font-size: large;
+}
+
+.textDanger {
+    color: red;
+}
+
+.textSuccess {
+    color: limegreen;
+}
+
+.textWarning {
+    color: orange;
+}

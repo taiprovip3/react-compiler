@@ -5,7 +5,7 @@ import AppFooter from '../../components/Footer';
 
 const { Content } = Layout;
 
-const Homepage: React.FC = () => {
+const HomePage: React.FC = () => {
   return (
     <Layout style={{ width: '100%', border: '1px solid green', minHeight: '100vh' }}>
       <AppHeader />
@@ -20,4 +20,4 @@ const Homepage: React.FC = () => {
   );
 };
 
-export default Homepage;
+export default HomePage;

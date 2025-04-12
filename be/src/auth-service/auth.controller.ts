@@ -10,6 +10,8 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  Query,
+  NotFoundException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -55,6 +57,11 @@ export class AuthController {
   async refresh(@Req() req: ExpressRequest) {
     const refreshToken: string = req.cookies['refreshToken'];
     return this.authService.refreshToken(refreshToken);
+  }
+
+  @Get('verify-email')
+  async verifyEmail(@Query('token') token: string) {
+    return await this.authService.verifyEmail(token);
   }
 
   /**
