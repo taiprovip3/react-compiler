@@ -45,26 +45,16 @@ const ProfilePage: React.FC = () => {
   const countryCodeOptions = [{value: '84', label: '+84'}];
 
   const handleUpload = async (options: any) => {
-    const { file, onSuccess, onError } = options;
+    const { file, onError } = options;
     const formData = new FormData();
-    formData.append('image', file);
+    // formData.append('image', file);
+    formData.append('file', file as any);
 
     try {
-      const res = await fetch('https://api.imgbb.com/1/upload?key=3a69f1e24abeb8084d33991c49646fa5', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await res.json();
-      console.log('result=', result);
-      if(result.success) {
-        setImageUrl(result.data.url);
-        onSuccess(result, file);
-        messageApi.success('Upload thành công!');
-      } else {
-        messageApi.success(result.error.message || 'Lỗi khi upload ảnh!');
-        throw new Error(result.error.message || 'Lỗi khi upload ảnh!');
-      }
+      const res = await userApi.uploadAvatar(formData);
+      const result = res.data;
+      messageApi.success('Upload avatar thành công!');
+      setImageUrl(result.avatar_url);
     } catch (err: any) {
       console.error('handleUpload catches error=', err);
       messageApi.error(err.message || 'Lỗi khi upload ảnh');
@@ -72,8 +62,7 @@ const ProfilePage: React.FC = () => {
     }
   }
 
-  const handleChange = ({ file, fileList }: UploadChangeParam) => {
-    // Kiểm tra file thành công
+  const handleChange = ({ file, fileList }: UploadChangeParam) => {// Vô dụng code, hàm tấu hề
     if (file.status === 'done') {
       messageApi.success(`${file.name} uploaded successfully`);
 
@@ -88,8 +77,6 @@ const ProfilePage: React.FC = () => {
   };
 
   const beforeUpload = (file: File) => {
-    console.log('beforeUpload active!');
-    
     const isImage = file.type === "image/jpeg" || file.type === "image/png";
     if(!isImage) {
       messageApi.error('Chỉ được upload ảnh định dạng JPG hoặc PNG!');
@@ -102,7 +89,6 @@ const ProfilePage: React.FC = () => {
       return Upload.LIST_IGNORE;
     }
 
-    console.log('Asking confirm before uploading...!');
     return new Promise((resolve, reject) => {
       modal.confirm({
         title: 'Xác nhận',
@@ -460,12 +446,14 @@ const ProfilePage: React.FC = () => {
                 />
                 <br />
                 <Upload
+                  name="file"
+                  showUploadList={false}
                   customRequest={handleUpload}
                   listType="picture"
                   fileList={fileList}
                   onChange={handleChange}
                   beforeUpload={beforeUpload}
-                  accept="image/*"
+                  accept=".png, .jpg, .jpeg"
                 >
                   <Button icon={<UploadOutlined />}>Upload avatar</Button>
                 </Upload>

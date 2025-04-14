@@ -19,7 +19,6 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ visible, onClose, onLogin
             const values = await form.validateFields();
             setLoading(true);
             const registerResponse = await authApi.register(values.username, values.password);
-            console.log('registerResponse=', registerResponse);
             form.resetFields();
             Swal.fire({
                 title: 'Thành công!',

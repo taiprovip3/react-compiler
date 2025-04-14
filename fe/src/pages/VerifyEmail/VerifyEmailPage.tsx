@@ -7,7 +7,6 @@ import { authApi } from '../../api';
 import styles from './VerifyEmailPage.module.css';
 
 const VerifyEmailPage = () => {
-    console.log('App rerender!');
     const calledRef = useRef(false);
     const [messageApi, contextHolder] = message.useMessage();
     const [searchParams] = useSearchParams();
@@ -34,7 +33,7 @@ const VerifyEmailPage = () => {
             }
         }
         verify();
-    }, []);
+    }, [messageApi, token]);
   return (
     <>
     {contextHolder}

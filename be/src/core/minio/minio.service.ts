@@ -5,10 +5,10 @@ import {
 } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
 import { extname } from 'path';
-import sharp from 'sharp';
-import { uuid } from 'uuidv4';
+import * as sharp from 'sharp';
+import { v4 as uuidv4 } from 'uuid';
 import * as dotenv from 'dotenv';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 dotenv.config();
 
@@ -30,8 +30,9 @@ export class MinioService {
   }
 
   async uploadAvatar(file: Express.Multer.File): Promise<string> {
+    // return avatarUrl if upload success
     const ext = extname(file.originalname);
-    const key = `avatar_${uuid()}${ext}`;
+    const key = `avatar_${uuidv4()}${ext}`;
 
     // Resize
     const resizedImage = await sharp(file.buffer).resize(256, 256).toBuffer();
@@ -50,9 +51,7 @@ export class MinioService {
 
   async deleteAvatarByUrl(url: string) {
     try {
-      console.log('url=', url);
       const key = url.split(`/${this.bucket}/`)[1];
-      console.log('key=', key);
       if (!key) {
         return;
       }
@@ -64,6 +63,9 @@ export class MinioService {
       );
     } catch (error) {
       console.warn('Không thể xóa avatar cũ', error.message);
+      throw new InternalServerErrorException(
+        'Can"t delete avatar when delete avatar by URL!',
+      );
     }
   }
 }

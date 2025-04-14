@@ -53,7 +53,6 @@ export class UserController {
     @Param('id') id: string,
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
-    console.log('updateProfileDto=', updateProfileDto);
     const userId = Number(id);
     return this.userService.updateProfile(userId, updateProfileDto);
   }
@@ -86,7 +85,7 @@ export class UserController {
     await this.userService.updateAvatar(user.id, avatarUrl);
     return {
       message: 'Cập nhật avatar thành công',
-      avatar: avatarUrl,
+      avatar_url: avatarUrl,
     };
   }
 

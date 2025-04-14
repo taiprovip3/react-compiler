@@ -41,7 +41,6 @@ export const AuthProvider:React.FC<AuthProviderProps> = ({ children }) => {
           console.error('Init can"t get user profile. Something went wrong!');
         }
         setUserData(userDataResponse);
-        console.log('userDataResponse=', userDataResponse);
       } catch (error: any) {
         console.error(error);
         if(error.code === 'ERR_BAD_REQUEST') {

@@ -41,7 +41,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onRegister })
           sessionStorage.setItem('userId', userId.toString());
           
           const userDataResponse = await userApi.getUserData(userId); // Gọi API lấy thông tin người dùng
-          console.log('userDataResponse=', userDataResponse);
           setUserData(userDataResponse);
           onClose();
           if(userDataResponse) {

@@ -77,7 +77,6 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const refreshToken: string = req.cookies?.refreshToken;
-    console.log('refreshToken=', refreshToken);
     if (!refreshToken) {
       throw new HttpException(
         'No refresh token found in cookies. You are not logged in!',
@@ -86,7 +85,6 @@ export class AuthController {
     }
 
     const user = req.user;
-    console.log('User logging out:', user);
     res.clearCookie('refreshToken', { path: '/' });
     return { message: 'Logged out!' };
   }

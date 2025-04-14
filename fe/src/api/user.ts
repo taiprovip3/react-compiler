@@ -8,8 +8,8 @@ export const getUserData = async (userId: number): Promise<User> => {
   return response.data;
 };
 
-export const getUserProfile = async (): Promise<Profile> => {
-  const response = await http.get('/users/profile');
+export const getUserProfile = async (userId: number): Promise<Profile> => {
+  const response = await http.get(`/users/profile/${userId}`);
   return response.data;
 };
 
@@ -17,3 +17,11 @@ export const updateUserProfile = async (userId: number, data: UpdateUserProfile)
   const response = await http.patch(`/users/profile/${userId}`, data);
   return response.data;
 };
+
+export const uploadAvatar = async (formData: FormData) => {
+  return await http.post('/users/avatar', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+}
