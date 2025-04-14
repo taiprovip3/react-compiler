@@ -1,14 +1,10 @@
-@media (max-width: 768px) {
-    .responsiveSelect {
-        width: 100% !important;
-    }
+.profileLeftPanel {
+    padding: 0 25px;
 }
 
-.responsiveSelect {
-    width: 200;
-    color: aquamarine;
-}
-
-.error {
-    background-color: blue;
+.profileRightPanel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }

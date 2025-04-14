@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Layout, Menu, Form, Input, Button, Modal, List, Avatar, message, DatePicker, Select, Space, Checkbox } from "antd";
+import { Layout, Menu, Form, Input, Button, Modal, List, Avatar, message, DatePicker, Select, Space, Checkbox, Image, Row, Col, Upload } from "antd";
 import styled from "styled-components";
 import { AuthContext } from "../../contexts/AuthContext"; // Context chứa userData
 import AppHeader from "../../components/Header";
@@ -8,6 +8,8 @@ import moment from "moment";
 import styles from './ProfilePage.module.css';
 import { userApi } from "../../api";
 import Swal from "sweetalert2";
+import { UploadOutlined } from "@ant-design/icons";
+import { UploadChangeParam, UploadFile } from "antd/es/upload";
 
 const { Option } = Select;
 const { Content, Sider } = Layout;
@@ -28,17 +30,89 @@ const ProfilePage: React.FC = () => {
   const [addresses, setAddresses] = useState(userData?.profile?.addresses || []);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingAddress, setEditingAddress] = useState<any>(null);
-  const [messageApi, contextHolder] = message.useMessage();
+  const [messageApi, messageContextHolder] = message.useMessage();
+  const [modal, modalContextHolder] = Modal.useModal();
   const [fullnameInputStatus, setFullnameInputStatus] = useState<"" | "error" | "warning" | undefined>("");
   const [phoneNumberInputStatus, setPhoneNumberInputStatus] = useState<"" | "error" | "warning" | undefined>("");
   const [emailInputStatus, setEmailInputStatus] = useState<"" | "error" | "warning" | undefined>("");
   const [genderInputStatus, setGenderInputStatus] = useState<"" | "error" | "warning" | undefined>("");
   const [dateOfBirthInputStatus, setDateOfBirthInputStatus] = useState<"" | "error" | "warning" | undefined>("");
   const [defaultAddressInputStatus, setDefaultAddressInputStatus] = useState<"" | "error" | "warning" | undefined>("");
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const sideBarItems = [{key: 'profile', label: 'Thông tin'}, {key: 'addresses', label: 'Địa chỉ'}, {key: 'password', label: 'Mật khẩu'}];
   const countryCodeOptions = [{value: '84', label: '+84'}];
 
+  const handleUpload = async (options: any) => {
+    const { file, onSuccess, onError } = options;
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await fetch('https://api.imgbb.com/1/upload?key=3a69f1e24abeb8084d33991c49646fa5', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await res.json();
+      console.log('result=', result);
+      if(result.success) {
+        setImageUrl(result.data.url);
+        onSuccess(result, file);
+        messageApi.success('Upload thành công!');
+      } else {
+        messageApi.success(result.error.message || 'Lỗi khi upload ảnh!');
+        throw new Error(result.error.message || 'Lỗi khi upload ảnh!');
+      }
+    } catch (err: any) {
+      console.error('handleUpload catches error=', err);
+      messageApi.error(err.message || 'Lỗi khi upload ảnh');
+      onError(err)
+    }
+  }
+
+  const handleChange = ({ file, fileList }: UploadChangeParam) => {
+    // Kiểm tra file thành công
+    if (file.status === 'done') {
+      messageApi.success(`${file.name} uploaded successfully`);
+
+      const uploadedUrl = file.response?.data.url || file.response?.url;
+      if(uploadedUrl) {
+        setImageUrl(uploadedUrl);
+      }
+    } else if (file.status === 'error') {
+      messageApi.error(`${file.name} upload failed.`);
+    }
+    setFileList(fileList);
+  };
+
+  const beforeUpload = (file: File) => {
+    console.log('beforeUpload active!');
+    
+    const isImage = file.type === "image/jpeg" || file.type === "image/png";
+    if(!isImage) {
+      messageApi.error('Chỉ được upload ảnh định dạng JPG hoặc PNG!');
+      return Upload.LIST_IGNORE;
+    }
+
+    const isLt2m = file.size / 1024 / 1024 < 2;
+    if(!isLt2m) {
+      messageApi.error('Ảnh phải nhỏ hơn 2MB');
+      return Upload.LIST_IGNORE;
+    }
+
+    console.log('Asking confirm before uploading...!');
+    return new Promise((resolve, reject) => {
+      modal.confirm({
+        title: 'Xác nhận',
+        content: `Bạn có chắc chắn muốn upload hình ảnh "${file.name}"`,
+        onOk: () => resolve(true),
+        onCancel: () => reject('Cancaled by user!'),
+      });
+    });
+  }
+  
   const renderSendEmailVerificationCheckboxFormItem = () => {
     if(userData?.isEmailVerified) {
       return <>
@@ -46,7 +120,7 @@ const ProfilePage: React.FC = () => {
         <Form.Item name="email" label="Email (verified ✅✨)" style={{ width: '90%' }}>
           <Input disabled />
         </Form.Item>
-        <Button color="danger" variant="text">Change</Button>
+        {/* <Button color="danger" variant="text">Change</Button> */}
       </Space.Compact>
       </>
     } else {
@@ -198,14 +272,14 @@ const ProfilePage: React.FC = () => {
           addr.id === editingAddress.id ? { ...editingAddress, ...values } : addr
         )
       );
-      message.success("Address updated successfully!");
+      messageApi.success("Address updated successfully!");
     } else {
       // Add new address
       setAddresses((prev: any) => [
         ...prev,
         { id: Date.now(), ...values },
       ]);
-      message.success("Address added successfully!");
+      messageApi.success("Address added successfully!");
     }
     setIsModalVisible(false);
     setEditingAddress(null);
@@ -213,17 +287,17 @@ const ProfilePage: React.FC = () => {
 
   const deleteAddress = (id: number) => {
     setAddresses((prev: any) => prev.filter((addr: any) => addr.id !== id));
-    message.success("Address deleted successfully!");
+    messageApi.success("Address deleted successfully!");
   };
 
   return (
     <>
-    {contextHolder}
+    {messageContextHolder}
     <Layout style={{ minHeight: "100vh" }}>
       <AppHeader />
       <Layout>
 
-      
+
         <Sider width={200} className="site-layout-background">
           <Menu
             mode="inline"
@@ -235,140 +309,169 @@ const ProfilePage: React.FC = () => {
           </Menu>
         </Sider>
         <Content>
-          <StyledContent>
-            {selectedMenu === "profile" && (
-              <div>
-                <h2>Thông tin cá nhân</h2>
-                <Form
-                  form={form}
-                  initialValues={{
-                    ...userData, // Giữ nguyên các giá trị khác
-                    dateOfBirth: userData?.profile?.dateOfBirth ? moment(userData.profile.dateOfBirth) : null, // Chuyển đổi dateOfBirth
-                    gender: userData?.profile?.gender ?? 'empty',
-                    fullname: userData?.profile?.fullname,
-                    phoneNumber: userData?.profile.phoneNumber,
-                    emailUsername: userData?.email?.split('@')[0],
-                    emailDomain: userData?.email ? userData.email.substring(userData.email.indexOf('@')) : '@gmail.com',
-                  }}
-                  onFinish={updateProfile}
-                  layout="vertical"
-                >
-                  <Form.Item name="fullname" label="Họ và Tên">
-                    <Input status={fullnameInputStatus} />
-                  </Form.Item>
-                  <Form.Item name="phoneNumber" label="Số điện thoại">
-                    <Space.Compact>
-                      <Select defaultValue="84" options={countryCodeOptions} />
-                      <Input defaultValue={userData?.profile?.phoneNumber} status={phoneNumberInputStatus} onBlur={() => setPhoneNumberInputStatus("")}  />
-                    </Space.Compact>
-                  </Form.Item>
-                  {
-                    renderSendEmailVerificationCheckboxFormItem()
-                  }
-                  <Form.Item name="gender" label="Giới tính">
-                    <Select
-                      options={[
-                        { value: 'Male', label: 'Male' },
-                        { value: 'Female', label: 'Female' },
-                        { value: 'Others', label: 'Others' },
-                        { value: 'empty', label: 'Select gender', disabled: true },
-                      ]}
-                      status={genderInputStatus}
-                      onBlur={() => setGenderInputStatus("")} 
-                    />
-                  </Form.Item>
-                  <Form.Item name="dateOfBirth" label="Ngày sinh">
-                    <DatePicker
-                      format="YYYY-MM-DD"
-                      status={dateOfBirthInputStatus}
-                      onBlur={() => setDateOfBirthInputStatus("")} 
-                    />
-                  </Form.Item>
-                  <Form.Item name="defaultAddress" label="Địa chỉ mặc định">
-                    <Input status={defaultAddressInputStatus} onBlur={() => setDefaultAddressInputStatus("")}  />
-                  </Form.Item>
-                  <Button type="primary" htmlType="submit">Cập nhật</Button>
-                </Form>
-              </div>
-            )}
-
-            {selectedMenu === "addresses" && (
-              <div>
-                <h2>Quản lý địa chỉ</h2>
-                <Button type="primary" onClick={() => setIsModalVisible(true)}>
-                  Thêm địa chỉ
-                </Button>
-                <List
-                  itemLayout="horizontal"
-                  dataSource={addresses}
-                  renderItem={(item: any) => (
-                    <List.Item
-                      actions={[
-                        <Button onClick={() => handleEditAddress(item)}>Sửa</Button>,
-                        <Button danger onClick={() => deleteAddress(item.id)}>
-                          Xóa
-                        </Button>,
-                      ]}
-                    >
-                      <List.Item.Meta
-                        avatar={<Avatar style={{ backgroundColor: "#87d068" }}>{item.fullName[0]}</Avatar>}
-                        title={item.fullName}
-                        description={`${item.address} - ${item.phoneNumber}`}
-                      />
-                    </List.Item>
-                  )}
-                />
-                <Modal
-                  title={editingAddress ? "Sửa địa chỉ" : "Thêm địa chỉ"}
-                  open={isModalVisible}
-                  onCancel={() => setIsModalVisible(false)}
-                  footer={null}
-                >
+          <Row>
+            <Col span={12} style={{ border: '1px solid orange' }} className={styles.profileLeftPanel}>
+              {selectedMenu === "profile" && (
+                <div>
+                  <h2>Thông tin cá nhân</h2>
                   <Form
-                    initialValues={editingAddress || {}}
-                    onFinish={handleSaveAddress}
+                    form={form}
+                    initialValues={{
+                      ...userData, // Giữ nguyên các giá trị khác
+                      dateOfBirth: userData?.profile?.dateOfBirth ? moment(userData.profile.dateOfBirth) : null, // Chuyển đổi dateOfBirth
+                      gender: userData?.profile?.gender ?? 'empty',
+                      fullname: userData?.profile?.fullname,
+                      phoneNumber: userData?.profile.phoneNumber,
+                      emailUsername: userData?.email?.split('@')[0],
+                      emailDomain: userData?.email ? userData.email.substring(userData.email.indexOf('@')) : '@gmail.com',
+                    }}
+                    onFinish={updateProfile}
                     layout="vertical"
                   >
                     <Form.Item name="fullname" label="Họ và Tên">
-                      <Input />
+                      <Input status={fullnameInputStatus} />
                     </Form.Item>
                     <Form.Item name="phoneNumber" label="Số điện thoại">
-                      <Input />
+                      <Space.Compact>
+                        <Select defaultValue="84" options={countryCodeOptions} />
+                        <Input defaultValue={userData?.profile?.phoneNumber} status={phoneNumberInputStatus} onBlur={() => setPhoneNumberInputStatus("")}  />
+                      </Space.Compact>
                     </Form.Item>
-                    <Form.Item name="countryCode" label="Mã quốc gia">
-                      <Input />
+                    {
+                      renderSendEmailVerificationCheckboxFormItem()
+                    }
+                    <Form.Item name="gender" label="Giới tính">
+                      <Select
+                        options={[
+                          { value: 'Male', label: 'Male' },
+                          { value: 'Female', label: 'Female' },
+                          { value: 'Others', label: 'Others' },
+                          { value: 'empty', label: 'Select gender', disabled: true },
+                        ]}
+                        status={genderInputStatus}
+                        onBlur={() => setGenderInputStatus("")} 
+                      />
                     </Form.Item>
-                    <Form.Item name="address" label="Địa chỉ">
-                      <Input />
+                    <Form.Item name="dateOfBirth" label="Ngày sinh">
+                      <DatePicker
+                        format="YYYY-MM-DD"
+                        status={dateOfBirthInputStatus}
+                        onBlur={() => setDateOfBirthInputStatus("")} 
+                      />
+                    </Form.Item>
+                    <Form.Item name="defaultAddress" label="Địa chỉ mặc định">
+                      <Input status={defaultAddressInputStatus} onBlur={() => setDefaultAddressInputStatus("")}  />
+                    </Form.Item>
+                    <Button type="primary" htmlType="submit">Cập nhật</Button>
+                  </Form>
+                </div>
+              )}
+
+              {selectedMenu === "addresses" && (
+                <div>
+                  <h2>Quản lý địa chỉ</h2>
+                  <Button type="primary" onClick={() => setIsModalVisible(true)}>
+                    Thêm địa chỉ
+                  </Button>
+                  <List
+                    itemLayout="horizontal"
+                    dataSource={addresses}
+                    renderItem={(item: any) => (
+                      <List.Item
+                        actions={[
+                          <Button onClick={() => handleEditAddress(item)}>Sửa</Button>,
+                          <Button danger onClick={() => deleteAddress(item.id)}>
+                            Xóa
+                          </Button>,
+                        ]}
+                      >
+                        <List.Item.Meta
+                          avatar={<Avatar style={{ backgroundColor: "#87d068" }}>{item.fullName[0]}</Avatar>}
+                          title={item.fullName}
+                          description={`${item.address} - ${item.phoneNumber}`}
+                        />
+                      </List.Item>
+                    )}
+                  />
+                  <Modal
+                    title={editingAddress ? "Sửa địa chỉ" : "Thêm địa chỉ"}
+                    open={isModalVisible}
+                    onCancel={() => setIsModalVisible(false)}
+                    footer={null}
+                  >
+                    <Form
+                      initialValues={editingAddress || {}}
+                      onFinish={handleSaveAddress}
+                      layout="vertical"
+                    >
+                      <Form.Item name="fullname" label="Họ và Tên">
+                        <Input />
+                      </Form.Item>
+                      <Form.Item name="phoneNumber" label="Số điện thoại">
+                        <Input />
+                      </Form.Item>
+                      <Form.Item name="countryCode" label="Mã quốc gia">
+                        <Input />
+                      </Form.Item>
+                      <Form.Item name="address" label="Địa chỉ">
+                        <Input />
+                      </Form.Item>
+                      <Button type="primary" htmlType="submit">
+                        Lưu
+                      </Button>
+                    </Form>
+                  </Modal>
+                </div>
+              )}
+
+              {selectedMenu === "password" && (
+                <div>
+                  <h2>Đổi mật khẩu</h2>
+                  <Form layout="vertical" onFinish={(values) => console.log("Changing password with:", values)}>
+                    <Form.Item name="currentPassword" label="Mật khẩu hiện tại">
+                      <Input.Password />
+                    </Form.Item>
+                    <Form.Item name="newPassword" label="Mật khẩu mới">
+                      <Input.Password />
+                    </Form.Item>
+                    <Form.Item name="confirmPassword" label="Xác nhận mật khẩu mới">
+                      <Input.Password />
                     </Form.Item>
                     <Button type="primary" htmlType="submit">
-                      Lưu
+                      Đổi mật khẩu
                     </Button>
                   </Form>
-                </Modal>
+                </div>
+              )}
+            </Col>
+            <Col span={12} style={{ border: '1px solid blue' }} className={styles.profileRightPanel}>
+              <div style={{ border: '1px solid brown' }}>
+                <Image
+                  width={200}
+                  src={imageUrl ? imageUrl : userData?.profile.avatar}
+                  preview={false}
+                  style={{
+                    width: 200,
+                    height: 200,
+                    borderRadius: '50%', // 👈 làm tròn
+                    objectFit: 'cover',  // 👈 giúp ảnh phủ đều không bị méo
+                    border: '1px solid #ccc', // tuỳ chọn, thêm viền cho đẹp
+                  }}
+                />
+                <br />
+                <Upload
+                  customRequest={handleUpload}
+                  listType="picture"
+                  fileList={fileList}
+                  onChange={handleChange}
+                  beforeUpload={beforeUpload}
+                  accept="image/*"
+                >
+                  <Button icon={<UploadOutlined />}>Upload avatar</Button>
+                </Upload>
               </div>
-            )}
-
-            {selectedMenu === "password" && (
-              <div>
-                <h2>Đổi mật khẩu</h2>
-                <Form layout="vertical" onFinish={(values) => console.log("Changing password with:", values)}>
-                  <Form.Item name="currentPassword" label="Mật khẩu hiện tại">
-                    <Input.Password />
-                  </Form.Item>
-                  <Form.Item name="newPassword" label="Mật khẩu mới">
-                    <Input.Password />
-                  </Form.Item>
-                  <Form.Item name="confirmPassword" label="Xác nhận mật khẩu mới">
-                    <Input.Password />
-                  </Form.Item>
-                  <Button type="primary" htmlType="submit">
-                    Đổi mật khẩu
-                  </Button>
-                </Form>
-              </div>
-            )}
-          </StyledContent>
+            </Col>
+          </Row>
         </Content>
 
 
@@ -376,6 +479,7 @@ const ProfilePage: React.FC = () => {
 
       <AppFooter />
     </Layout>
+    {modalContextHolder}
     </>
   );
 };
