@@ -1,8 +1,8 @@
 import React from 'react';
 import { Modal, Button, Form, Input, Checkbox } from 'antd';
-import { AuthContext } from '../contexts/AuthContext';
+import { AuthContext } from '../../contexts/AuthContext';
 import Swal from 'sweetalert2';
-import { authApi, userApi } from '../api';
+import { authApi, userApi } from '../../api';
 import { jwtDecode } from 'jwt-decode';
 
 interface LoginModalProps {

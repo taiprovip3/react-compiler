@@ -2,7 +2,7 @@ import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Button, Form, Input, Modal } from 'antd';
 import React from 'react';
 import Swal from 'sweetalert2';
-import { authApi } from '../api';
+import { authApi } from '../../api';
 
 interface RegisterModalProps {
     visible: boolean;

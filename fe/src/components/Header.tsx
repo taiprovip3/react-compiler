@@ -2,10 +2,10 @@ import React from 'react';
 import { Layout, Menu, MenuProps } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
-import LoginModal from './LoginModal';
-import RegisterModal from './RegisterModal';
+import LoginModal from './Authetication/LoginModal';
+import RegisterModal from './Authetication/RegisterModal';
 import { AuthContext } from '../contexts/AuthContext';
-import LoggedComponent from './LoggedComponent';
+import LoggedComponent from './Authetication/LoggedComponent';
 import { useNavigate } from 'react-router-dom';
 
 const { Header } = Layout;

@@ -1,6 +1,5 @@
 import React, { useState, useContext } from "react";
 import { Layout, Menu, Form, Input, Button, Modal, List, Avatar, message, DatePicker, Select, Space, Checkbox, Image, Row, Col, Upload } from "antd";
-import styled from "styled-components";
 import { AuthContext } from "../../contexts/AuthContext"; // Context chứa userData
 import AppHeader from "../../components/Header";
 import AppFooter from "../../components/Footer";
@@ -13,15 +12,6 @@ import { UploadChangeParam, UploadFile } from "antd/es/upload";
 
 const { Option } = Select;
 const { Content, Sider } = Layout;
-
-const StyledContent = styled(Content)`
-  padding: 24px;
-  background-color: #fff;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-`;
 
 const ProfilePage: React.FC = () => {
   const { userData } = useContext(AuthContext); // Lấy userData từ AuthContext
@@ -295,9 +285,9 @@ const ProfilePage: React.FC = () => {
           </Menu>
         </Sider>
         <Content>
-          <Row>
-            <Col span={12} style={{ border: '1px solid orange' }} className={styles.profileLeftPanel}>
-              {selectedMenu === "profile" && (
+          {selectedMenu === "profile" && (
+            <Row>
+              <Col span={12} style={{ border: '3px solid orange' }} className={styles.profileLeftPanel}>
                 <div>
                   <h2>Thông tin cá nhân</h2>
                   <Form
@@ -351,115 +341,115 @@ const ProfilePage: React.FC = () => {
                     <Button type="primary" htmlType="submit">Cập nhật</Button>
                   </Form>
                 </div>
-              )}
-
-              {selectedMenu === "addresses" && (
+              </Col>
+              <Col span={12} style={{ border: '3px solid blue' }} className={styles.profileRightPanel}>
                 <div>
-                  <h2>Quản lý địa chỉ</h2>
-                  <Button type="primary" onClick={() => setIsModalVisible(true)}>
-                    Thêm địa chỉ
-                  </Button>
-                  <List
-                    itemLayout="horizontal"
-                    dataSource={addresses}
-                    renderItem={(item: any) => (
-                      <List.Item
-                        actions={[
-                          <Button onClick={() => handleEditAddress(item)}>Sửa</Button>,
-                          <Button danger onClick={() => deleteAddress(item.id)}>
-                            Xóa
-                          </Button>,
-                        ]}
-                      >
-                        <List.Item.Meta
-                          avatar={<Avatar style={{ backgroundColor: "#87d068" }}>{item.fullName[0]}</Avatar>}
-                          title={item.fullName}
-                          description={`${item.address} - ${item.phoneNumber}`}
-                        />
-                      </List.Item>
-                    )}
+                  <Image
+                    width={200}
+                    src={imageUrl ? imageUrl : userData?.profile.avatar}
+                    preview={false}
+                    style={{
+                      width: 200,
+                      height: 200,
+                      borderRadius: '50%', // 👈 làm tròn
+                      objectFit: 'cover',  // 👈 giúp ảnh phủ đều không bị méo
+                      border: '1px solid #ccc', // tuỳ chọn, thêm viền cho đẹp
+                    }}
                   />
-                  <Modal
-                    title={editingAddress ? "Sửa địa chỉ" : "Thêm địa chỉ"}
-                    open={isModalVisible}
-                    onCancel={() => setIsModalVisible(false)}
-                    footer={null}
+                  <br />
+                  <Upload
+                    name="file"
+                    showUploadList={false}
+                    customRequest={handleUpload}
+                    listType="picture"
+                    fileList={fileList}
+                    onChange={handleChange}
+                    beforeUpload={beforeUpload}
+                    accept=".png, .jpg, .jpeg"
                   >
-                    <Form
-                      initialValues={editingAddress || {}}
-                      onFinish={handleSaveAddress}
-                      layout="vertical"
-                    >
-                      <Form.Item name="fullname" label="Họ và Tên">
-                        <Input />
-                      </Form.Item>
-                      <Form.Item name="phoneNumber" label="Số điện thoại">
-                        <Input />
-                      </Form.Item>
-                      <Form.Item name="countryCode" label="Mã quốc gia">
-                        <Input />
-                      </Form.Item>
-                      <Form.Item name="address" label="Địa chỉ">
-                        <Input />
-                      </Form.Item>
-                      <Button type="primary" htmlType="submit">
-                        Lưu
-                      </Button>
-                    </Form>
-                  </Modal>
+                    <Button icon={<UploadOutlined />}>Upload avatar</Button>
+                  </Upload>
                 </div>
-              )}
+              </Col>
+            </Row>
+          )}
 
-              {selectedMenu === "password" && (
-                <div>
-                  <h2>Đổi mật khẩu</h2>
-                  <Form layout="vertical" onFinish={(values) => console.log("Changing password with:", values)}>
-                    <Form.Item name="currentPassword" label="Mật khẩu hiện tại">
-                      <Input.Password />
-                    </Form.Item>
-                    <Form.Item name="newPassword" label="Mật khẩu mới">
-                      <Input.Password />
-                    </Form.Item>
-                    <Form.Item name="confirmPassword" label="Xác nhận mật khẩu mới">
-                      <Input.Password />
-                    </Form.Item>
-                    <Button type="primary" htmlType="submit">
-                      Đổi mật khẩu
-                    </Button>
-                  </Form>
-                </div>
-              )}
-            </Col>
-            <Col span={12} style={{ border: '1px solid blue' }} className={styles.profileRightPanel}>
-              <div style={{ border: '1px solid brown' }}>
-                <Image
-                  width={200}
-                  src={imageUrl ? imageUrl : userData?.profile.avatar}
-                  preview={false}
-                  style={{
-                    width: 200,
-                    height: 200,
-                    borderRadius: '50%', // 👈 làm tròn
-                    objectFit: 'cover',  // 👈 giúp ảnh phủ đều không bị méo
-                    border: '1px solid #ccc', // tuỳ chọn, thêm viền cho đẹp
-                  }}
-                />
-                <br />
-                <Upload
-                  name="file"
-                  showUploadList={false}
-                  customRequest={handleUpload}
-                  listType="picture"
-                  fileList={fileList}
-                  onChange={handleChange}
-                  beforeUpload={beforeUpload}
-                  accept=".png, .jpg, .jpeg"
+          {selectedMenu === "addresses" && (
+            <div>
+              <h2>Quản lý địa chỉ</h2>
+              <Button type="primary" onClick={() => setIsModalVisible(true)}>
+                Thêm địa chỉ
+              </Button>
+              <List
+                itemLayout="horizontal"
+                dataSource={addresses}
+                renderItem={(item: any) => (
+                  <List.Item
+                    actions={[
+                      <Button onClick={() => handleEditAddress(item)}>Sửa</Button>,
+                      <Button danger onClick={() => deleteAddress(item.id)}>
+                        Xóa
+                      </Button>,
+                    ]}
+                  >
+                    <List.Item.Meta
+                      avatar={<Avatar style={{ backgroundColor: "#87d068" }}>{item.fullName[0]}</Avatar>}
+                      title={item.fullName}
+                      description={`${item.address} - ${item.phoneNumber}`}
+                    />
+                  </List.Item>
+                )}
+              />
+              <Modal
+                title={editingAddress ? "Sửa địa chỉ" : "Thêm địa chỉ"}
+                open={isModalVisible}
+                onCancel={() => setIsModalVisible(false)}
+                footer={null}
+              >
+                <Form
+                  initialValues={editingAddress || {}}
+                  onFinish={handleSaveAddress}
+                  layout="vertical"
                 >
-                  <Button icon={<UploadOutlined />}>Upload avatar</Button>
-                </Upload>
-              </div>
-            </Col>
-          </Row>
+                  <Form.Item name="fullname" label="Họ và Tên">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name="phoneNumber" label="Số điện thoại">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name="countryCode" label="Mã quốc gia">
+                    <Input />
+                  </Form.Item>
+                  <Form.Item name="address" label="Địa chỉ">
+                    <Input />
+                  </Form.Item>
+                  <Button type="primary" htmlType="submit">
+                    Lưu
+                  </Button>
+                </Form>
+              </Modal>
+            </div>
+          )}
+
+          {selectedMenu === "password" && (
+            <div>
+              <h2>Đổi mật khẩu</h2>
+              <Form layout="vertical" onFinish={(values) => console.log("Changing password with:", values)}>
+                <Form.Item name="currentPassword" label="Mật khẩu hiện tại">
+                  <Input.Password />
+                </Form.Item>
+                <Form.Item name="newPassword" label="Mật khẩu mới">
+                  <Input.Password />
+                </Form.Item>
+                <Form.Item name="confirmPassword" label="Xác nhận mật khẩu mới">
+                  <Input.Password />
+                </Form.Item>
+                <Button type="primary" htmlType="submit">
+                  Đổi mật khẩu
+                </Button>
+              </Form>
+            </div>
+          )}
         </Content>
 
 

@@ -2,8 +2,8 @@ import React from 'react';
 import { Badge, Button, Dropdown, MenuProps } from 'antd';
 import { BellOutlined, DownOutlined, LogoutOutlined, ProductOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext';
-import { authApi } from '../api';
+import { AuthContext } from '../../contexts/AuthContext';
+import { authApi } from '../../api';
 
 const LoggedComponent: React.FC = () => {
   const { userData, setUserData } = React.useContext(AuthContext);
