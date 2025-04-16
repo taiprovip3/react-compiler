@@ -108,7 +108,7 @@ export class UserService {
     return { message: 'Đổi mật khẩu thành công' };
   }
 
-  async getProfile(userId: number) {
+  async getProfile(userId: number): Promise<Profile> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['profile'],

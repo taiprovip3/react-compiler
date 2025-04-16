@@ -1,6 +1,6 @@
 export interface Address {
     id: number;
-    fullName: string;
+    fullname: string;
     phoneNumber: string;
     countryCode: string;
     address: string;

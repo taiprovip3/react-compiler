@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CoreModule } from './core/core.module';
 import { AuthModule } from './auth-service/auth.module';
 import { UserModule } from './user-service/user.module';
+import { AddressModule } from './address-service/address.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserModule } from './user-service/user.module';
     TypeOrmModule.forRoot(typeOrmConfig),
     AuthModule,
     UserModule,
+    AddressModule,
     TokenModule,
     CoreModule,
   ],
