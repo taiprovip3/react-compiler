@@ -234,9 +234,9 @@ const UserInfomation = () => {
         <>
           {messageContextHolder}
           <Row>
-              <Col xs={24} lg={12} style={{ border: '3px solid orange' }} className={styles.profileLeftPanel}>
+              <Col xs={24} lg={12} className={styles.profileLeftPanel}>
                 <div>
-                  <Divider orientation="left" style={{ borderColor: 'lightgrey' }}>Thông Tin Cá Nhân</Divider>
+                  <Divider orientation="left">Thông Tin Cá Nhân</Divider>
                   <Form
                     form={form}
                     initialValues={{
@@ -290,7 +290,7 @@ const UserInfomation = () => {
                   </Form>
                 </div>
               </Col>
-            <Col xs={24} lg={12} style={{ border: '3px solid blue' }} className={styles.profileRightPanel}>
+            <Col xs={24} lg={12} className={styles.profileRightPanel}>
               <div>
                 <Image
                   width={200}

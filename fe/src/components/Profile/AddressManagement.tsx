@@ -1,4 +1,4 @@
-import { Avatar, Button, Card, Divider, Form, Input, List, message, Modal, Select } from 'antd';
+import { Avatar, Button, Card, Divider, Empty, Form, Input, List, message, Modal, Select } from 'antd';
 import { useContext, useEffect, useState } from 'react'
 import AuthContext from '../../contexts/AuthContext';
 import { Address } from '../../types/Address';
@@ -26,7 +26,9 @@ const AddressManagement = () => {
     
     const renderDefaultAddressComponent = () => {
         if(!userData?.profile.defaultAddress) {
-            return;
+            return <>
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No default address" />
+            </>;
         }
 
         return <>
@@ -48,6 +50,7 @@ const AddressManagement = () => {
     const handleSaveAddress = async (addressObj: Address) => {
         if (editingAddress) { // Update existing address
             const updateAddressObj = await addressApi.updateAddress(editingAddress.id, addressObj);
+            console.log('updateAddressObj=', updateAddressObj);
             setAddresses((prev: any) =>
                 prev.map((addr: any) =>
                     addr.id === editingAddress.id ? { ...editingAddress, ...addressObj } : addr
@@ -79,8 +82,11 @@ const AddressManagement = () => {
         <div style={{ padding: '0 25px' }}>
             <Divider orientation="left" style={{ borderColor: 'lightgrey' }}>Quản Lý Địa Chỉ</Divider>
             { renderDefaultAddressComponent() }
-            <Divider orientation="left" variant='dashed' plain style={{ borderColor: '#f797ba' }}>Additional addresses:</Divider>
-            <Button type="primary" onClick={() => setIsModalVisible(true)}>Thêm địa chỉ</Button>
+            <div style={{ maxWidth: '500px' }}>
+                <Divider orientation="left" variant='dashed' plain style={{ borderColor: '#f797ba' }}>Additional addresses:</Divider>
+                <Button type="primary" onClick={() => setIsModalVisible(true)}>Thêm địa chỉ</Button>
+            </div>
+            
             <List
                 itemLayout="horizontal"
                 dataSource={addresses}

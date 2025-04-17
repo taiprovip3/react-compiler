@@ -38,7 +38,7 @@ const LoggedComponent: React.FC = () => {
   ];
 
   return (
-    <div style={{ border: '1px solid lime', paddingRight: '15px', textWrap: 'wrap', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+    <div style={{ paddingRight: '15px', textWrap: 'wrap', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
       <Dropdown menu={{ items, onClick }} trigger={['hover']} placement="bottomLeft">
           <Button onClick={(e) => e.preventDefault()} type="text" style={{ color: 'white' }} icon={<UserOutlined />}>{userData?.username}<DownOutlined /></Button>
       </Dropdown>

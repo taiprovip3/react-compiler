@@ -7,7 +7,7 @@ const { Content } = Layout;
 
 const HomePage: React.FC = () => {
   return (
-    <Layout style={{ width: '100%', border: '1px solid green', minHeight: '100vh' }}>
+    <Layout style={{ width: '100%', minHeight: '100vh' }}>
       <AppHeader />
       <Content style={{ padding: '0 50px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         <div className="site-layout-content" style={{ margin: '16px 0', textAlign: 'center' }}>

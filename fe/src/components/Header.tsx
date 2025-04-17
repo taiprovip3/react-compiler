@@ -65,11 +65,11 @@ const AppHeader: React.FC = () => {
   return (
     <>
     <Header
-        style={{position: 'sticky', top: 0, zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 0, border: '1px solid red'}}
+        style={{position: 'sticky', top: 0, zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 0}}
     >
-      <Menu defaultSelectedKeys={['1']} items={items} onClick={onClick} theme="dark" mode="horizontal" style={{ width: '100%', maxWidth: '50%', border: '1px solid blue' }} />
+      <Menu defaultSelectedKeys={['1']} items={items} onClick={onClick} theme="dark" mode="horizontal" style={{ width: '100%', maxWidth: '50%' }} />
 
-      <div style={{ maxWidth: '100%', textAlign: 'center', lineHeight: '1em', textWrap: 'wrap', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', border: '1px solid yellow' }}>
+      <div style={{ maxWidth: '100%', textAlign: 'center', lineHeight: '1em', textWrap: 'wrap', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
         <div className="logo" style={{  }}>
             <img src="https://images.cooltext.com/5705384.png" alt="TAICOMPUTER" width={'64'} style={{ maxWidth: '100%' }} />
         </div>
