@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { Layout, Menu, Form, Input, Button } from "antd";
+import { Layout, Menu } from "antd";
 import AppHeader from "../../components/Header";
 import AppFooter from "../../components/Footer";
 import UserInfomation from "../../components/Profile/UserInfomation";
 import AddressManagement from "../../components/Profile/AddressManagement";
+import PasswordManagement from "../../components/Profile/PasswordManagement";
 
 const { Content, Sider } = Layout;
 
@@ -38,30 +39,11 @@ const ProfilePage: React.FC = () => {
 
             {selectedMenu === "addresses" && <AddressManagement /> }
 
-            {selectedMenu === "password" && (
-              <div>
-                <h2>Đổi mật khẩu</h2>
-                <Form layout="vertical" onFinish={(values) => console.log("Changing password with:", values)}>
-                  <Form.Item name="currentPassword" label="Mật khẩu hiện tại">
-                    <Input.Password />
-                  </Form.Item>
-                  <Form.Item name="newPassword" label="Mật khẩu mới">
-                    <Input.Password />
-                  </Form.Item>
-                  <Form.Item name="confirmPassword" label="Xác nhận mật khẩu mới">
-                    <Input.Password />
-                  </Form.Item>
-                  <Button type="primary" htmlType="submit">
-                    Đổi mật khẩu
-                  </Button>
-                </Form>
-              </div>
-            )}
+            {selectedMenu === "password" && <PasswordManagement />}
           </Content>
 
 
         </Layout>
-
         <AppFooter />
       </Layout>
     </>

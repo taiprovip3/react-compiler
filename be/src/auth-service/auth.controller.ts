@@ -85,6 +85,8 @@ export class AuthController {
     }
 
     const user = req.user;
+    console.info(`User ${user} is logged out!`);
+    
     res.clearCookie('refreshToken', { path: '/' });
     return { message: 'Logged out!' };
   }

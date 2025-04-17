@@ -9,7 +9,6 @@ import { TokenModule } from 'src/token-service/token.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from 'src/user-service/user.module';
 import { MailService } from 'src/core/mail/mail.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 
 dotenv.config();
 

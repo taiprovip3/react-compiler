@@ -9,6 +9,7 @@ import { CoreModule } from './core/core.module';
 import { AuthModule } from './auth-service/auth.module';
 import { UserModule } from './user-service/user.module';
 import { AddressModule } from './address-service/address.module';
+import { ProfileModule } from './profile-service/profile.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AddressModule } from './address-service/address.module';
     AddressModule,
     TokenModule,
     CoreModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,11 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Address } from 'src/entities/address.entity';
-import { User } from 'src/entities/user.entity';
 import { DeleteResult, Repository } from 'typeorm';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UserService } from 'src/user-service/user.service';
-import { relative } from 'path';
 
 @Injectable()
 export class AddressService {
@@ -14,6 +12,13 @@ export class AddressService {
     private readonly addressRepository: Repository<Address>,
     private readonly userService: UserService,
   ) {}
+
+  async getUserAddresses(userId: number): Promise<Address[]> {
+    const addresses = await this.addressRepository.find({
+      where: { profile: { user: { id: userId } } },
+    });
+    return addresses;
+  }
 
   async create(
     userId: number,
@@ -69,13 +74,6 @@ export class AddressService {
 
     Object.assign(addressObj, createAddressDto);
     return this.addressRepository.save(addressObj);
-  }
-
-  async getUserAddresses(userId: number): Promise<Address[]> {
-    const addresses = await this.addressRepository.find({
-      where: { profile: { user: { id: userId } } },
-    });
-    return addresses;
   }
 
   async delete(addressId: number, userId: number): Promise<DeleteResult> {

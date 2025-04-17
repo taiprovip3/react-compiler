@@ -5,7 +5,7 @@ import styles from '../../pages/Profile/ProfilePage.module.css';
 import { useContext, useState } from "react";
 import AuthContext from "../../contexts/AuthContext";
 import Swal from "sweetalert2";
-import { userApi } from "../../api";
+import { profileApi } from "../../api";
 
 const UserInfomation = () => {
   const { userData } = useContext(AuthContext);
@@ -159,22 +159,30 @@ const UserInfomation = () => {
       defaultAddress,
     }
     
-    const responseUpdateProfile = await userApi.updateUserProfile(userData!.id, resultObject);
-    Swal.fire({
-      title: "Update Profile",
-      text: responseUpdateProfile.message,
-      icon: "success",
-    });
+    try {
+      const responseUpdateProfile = await profileApi.updateUserProfile(userData!.id, resultObject);
+      Swal.fire({
+        title: "Update Profile",
+        text: responseUpdateProfile.message,
+        icon: "success",
+      });
+    } catch (error: any) {
+      console.error('updateProfile catch err:', error);
+      Swal.fire({
+        title: error?.response?.data?.error,
+        text: error?.response?.data?.message,
+        icon: "error",
+      });
+    }
   };
 
   const handleUploadAvatar = async (options: any) => {
     const { file, onError } = options;
     const formData = new FormData();
-    // formData.append('image', file);
     formData.append('file', file as any);
 
     try {
-      const res = await userApi.uploadAvatar(formData);
+      const res = await profileApi.uploadAvatar(formData);
       const result = res.data;
       messageApi.success('Upload avatar thành công!');
       setImageUrl(result.avatar_url);
@@ -239,6 +247,7 @@ const UserInfomation = () => {
                       phoneNumber: userData?.profile.phoneNumber,
                       emailUsername: userData?.email?.split('@')[0],
                       emailDomain: userData?.email ? userData.email.substring(userData.email.indexOf('@')) : '@gmail.com',
+                      defaultAddress: userData?.profile?.defaultAddress,
                     }}
                     onFinish={updateProfile}
                     layout="vertical"

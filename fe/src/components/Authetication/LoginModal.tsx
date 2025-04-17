@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Button, Form, Input, Checkbox } from 'antd';
+import { Modal, Button, Form, Input, Checkbox, message } from 'antd';
 import { AuthContext } from '../../contexts/AuthContext';
 import Swal from 'sweetalert2';
 import { authApi, userApi } from '../../api';
@@ -23,6 +23,7 @@ interface JwtPayload {
 const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onRegister }) => {
   const { setUserData } = React.useContext(AuthContext)!;
   const [form] = Form.useForm();
+  const [messageApi, messageContextHolder] = message.useMessage();
   const [loading, setLoading] = React.useState<boolean>(false);
   const usernameInputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -48,6 +49,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onRegister })
           } else {
             console.info(`User ${values.username} chỉ vừa mới tạo acc. Chưa có profile!`)
           }
+          messageApi.success(`Welcome back, ${userDataResponse.username}`);
         } else {
           Swal.fire({
             title: 'Error!',
@@ -58,21 +60,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onRegister })
         }
       } catch (error: any) {
         console.error('error=', error);
-        if (error.response && error.response.data.message === 'Bad credentials') {
-          Swal.fire({
-            title: 'Error!',
-            text: error.response.data.message,
-            icon: 'error',
-            confirmButtonText: 'Oops!'
-          });
-        } else {
-          Swal.fire({
-            title: 'Error!',
-            text: 'Có lỗi xảy ra, vui lòng thử lại sau!',
-            icon: 'error',
-            confirmButtonText: 'Oops!'
-          });
-        }
+        Swal.fire({
+          title: error?.response.data.error,
+          text: error?.response?.data?.message,
+          icon: 'error',
+          confirmButtonText: 'Oops!'
+        });
       } finally {
         setLoading(false);
       }
@@ -87,6 +80,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onRegister })
 
   return (
     <>
+      {messageContextHolder}
       <Modal
         getContainer={false}
         title="Đăng nhập"

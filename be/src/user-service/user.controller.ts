@@ -4,13 +4,10 @@ import {
   Delete,
   Get,
   Param,
-  ParseFilePipeBuilder,
   Patch,
   Post,
   Put,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -20,19 +17,13 @@ import { GetUser } from 'src/decorators/get-user.decorator';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { User } from 'src/entities/user.entity';
 import { AuthGuard } from '@nestjs/passport';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { MinioService } from 'src/core/minio/minio.service';
 import { JwtAuthGuard } from 'src/auth-service/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth-service/guards/roles.guard';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly minioService: MinioService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   @Get('admin')
   @Roles('ROLE_ADMIN')
@@ -40,21 +31,10 @@ export class UserController {
     return { message: 'This is admin data' };
   }
 
-  @Get('profile/:id')
+  @Get('user')
   @Roles('ROLE_USER')
-  getProfile(@Param('id') id: string) {
-    const userId = Number(id);
-    return this.userService.getProfile(userId);
-  }
-
-  @Patch('profile/:id')
-  @UseGuards(AuthGuard('jwt'))
-  updateProfile(
-    @Param('id') id: string,
-    @Body() updateProfileDto: UpdateProfileDto,
-  ) {
-    const userId = Number(id);
-    return this.userService.updateProfile(userId, updateProfileDto);
+  getUserData() {
+    return { message: 'This is user data' };
   }
 
   @Patch('change-password')
@@ -63,35 +43,8 @@ export class UserController {
     @GetUser() user: User,
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
-    return this.userService.changePassword(user.id, changePasswordDto);
-  }
-
-  @Post('avatar')
-  @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadAvatar(
-    @UploadedFile(
-      new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: /(jpg|jpeg|png)$/,
-        })
-        .addMaxSizeValidator({ maxSize: 2 * 1024 * 1024 }) // 2MB
-        .build({ fileIsRequired: true }),
-    )
-    file: Express.Multer.File,
-    @GetUser() user: User,
-  ) {
-    const avatarUrl = await this.minioService.uploadAvatar(file);
-    await this.userService.updateAvatar(user.id, avatarUrl);
-    return {
-      message: 'Cập nhật avatar thành công',
-      avatar_url: avatarUrl,
-    };
-  }
-
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    const userId = user.id;
+    return this.userService.changePassword(userId, changePasswordDto);
   }
 
   @Get()
@@ -102,6 +55,11 @@ export class UserController {
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.userService.findOne(+id);
+  }
+
+  @Post()
+  async create(@Body() createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
   }
 
   @Put(':id')

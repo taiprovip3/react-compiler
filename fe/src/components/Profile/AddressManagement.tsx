@@ -2,7 +2,7 @@ import { Avatar, Button, Card, Divider, Form, Input, List, message, Modal, Selec
 import { useContext, useEffect, useState } from 'react'
 import AuthContext from '../../contexts/AuthContext';
 import { Address } from '../../types/Address';
-import { userApi } from '../../api';
+import { addressApi } from '../../api';
 
 const AddressManagement = () => {
     const { userData } = useContext(AuthContext);
@@ -20,7 +20,7 @@ const AddressManagement = () => {
     }, []);
 
     const getUserAddresses = async () => {
-        const addresses = await userApi.getUserAddesses();
+        const addresses = await addressApi.getUserAddesses();
         setAddresses(addresses);
     }
     
@@ -47,9 +47,7 @@ const AddressManagement = () => {
 
     const handleSaveAddress = async (addressObj: Address) => {
         if (editingAddress) { // Update existing address
-            const updateAddressObj = await userApi.updateAddress(editingAddress.id, addressObj);
-            console.log('addressObj=', addressObj);
-            console.log('updateAddressObj=', updateAddressObj);
+            const updateAddressObj = await addressApi.updateAddress(editingAddress.id, addressObj);
             setAddresses((prev: any) =>
                 prev.map((addr: any) =>
                     addr.id === editingAddress.id ? { ...editingAddress, ...addressObj } : addr
@@ -57,8 +55,7 @@ const AddressManagement = () => {
             );
             messageApi.success("Address updated successfully!");
         } else { // Add new address
-            const createAddressObj = await userApi.createAddress(addressObj);
-            console.log('createAddressResult=', createAddressObj);
+            const createAddressObj = await addressApi.createAddress(addressObj);
               setAddresses((prev: any) => [
                 ...prev,
                 createAddressObj,
@@ -70,7 +67,7 @@ const AddressManagement = () => {
     };
 
     const deleteAddress = async (addressId: number) => {
-        const deleteAddressResult = await userApi.deleteAddress(addressId);
+        const deleteAddressResult = await addressApi.deleteAddress(addressId);
         console.log('deleteAddressResult=', deleteAddressResult);
         setAddresses((prev: any) => prev.filter((addr: any) => addr.id !== addressId));
         messageApi.success("Address deleted successfully!");
