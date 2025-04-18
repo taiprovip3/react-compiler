@@ -52,7 +52,7 @@ export const AuthProvider:React.FC<AuthProviderProps> = ({ children }) => {
 
   React.useEffect(() => {
     validateUserAuthentication();
-  }, []);
+  });
 
   return (
     <AuthContext.Provider value={{ userData, setUserData, validateUserAuthentication }}>

@@ -6,6 +6,7 @@ import { useContext, useState } from "react";
 import AuthContext from "../../contexts/AuthContext";
 import Swal from "sweetalert2";
 import { profileApi } from "../../api";
+import { UploadProps } from "antd/es/upload";
 
 const UserInfomation = () => {
   const { userData } = useContext(AuthContext);
@@ -193,7 +194,7 @@ const UserInfomation = () => {
     }
   }
 
-  const beforeUploadAvatar = (file: File) => {
+  const beforeUploadAvatar: UploadProps['beforeUpload'] = (file) => {
     const isImage = file.type === "image/jpeg" || file.type === "image/png";
     if(!isImage) {
       messageApi.error('Chỉ được upload ảnh định dạng JPG hoặc PNG!');
@@ -244,7 +245,7 @@ const UserInfomation = () => {
                       dateOfBirth: userData?.profile?.dateOfBirth ? moment(userData.profile.dateOfBirth) : null, // Chuyển đổi dateOfBirth
                       gender: userData?.profile?.gender ?? 'empty',
                       fullname: userData?.profile?.fullname,
-                      phoneNumber: userData?.profile.phoneNumber,
+                      phoneNumber: userData?.profile?.phoneNumber,
                       emailUsername: userData?.email?.split('@')[0],
                       emailDomain: userData?.email ? userData.email.substring(userData.email.indexOf('@')) : '@gmail.com',
                       defaultAddress: userData?.profile?.defaultAddress,
@@ -294,7 +295,7 @@ const UserInfomation = () => {
               <div>
                 <Image
                   width={200}
-                  src={imageUrl ? imageUrl : userData?.profile.avatar}
+                  src={imageUrl ? imageUrl : userData?.profile?.avatar}
                   preview={false}
                   style={{
                     width: 100,

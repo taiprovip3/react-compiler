@@ -1,5 +1,4 @@
 import { ChangePasswordDto } from '../dto/change-password.dto';
-import { Address } from '../types/Address';
 import { User } from '../types/User';
 import http from './http';
 

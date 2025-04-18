@@ -59,14 +59,17 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onRegister })
           });
         }
       } catch (error: any) {
-        console.error('error=', error);
-        messageApi.error('Đã xảy ra lỗi. Vui lòng kiểm tra logs!');
-        Swal.fire({
-          title: error?.response?.data.error,
-          text: error?.response?.data?.message,
-          icon: 'error',
-          confirmButtonText: 'Oops!'
-        });
+        if(error.name === 'AxiosError') {
+          Swal.fire({
+            title: error?.response?.data.error,
+            text: error?.response?.data?.message,
+            icon: 'error',
+            confirmButtonText: 'Oops!'
+          });
+        } else {
+          console.error('error=', error);
+          messageApi.error('Đã xảy ra lỗi. Vui lòng kiểm tra logs!');
+        }
       } finally {
         setLoading(false);
       }

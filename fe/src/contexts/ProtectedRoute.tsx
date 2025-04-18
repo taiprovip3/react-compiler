@@ -8,13 +8,12 @@ interface ProtectedRouteProps {
 }
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const { userData, setUserData } = useContext(AuthContext);
-    const [isLoading, setIsLoading] = useState(true);
     const [redirect, setRedirect] = useState(false);
 
     useEffect(() => {
         const checkUser = async () => {
             if(userData) {
-                setIsLoading(false); // Đảm bảo đã có userData -> Code chạy tiếp đến return <>{children}</> -> render ProfilePage
+                // Đảm bảo đã có userData -> Code chạy tiếp đến return <>{children}</> -> render ProfilePage
                 return;
             }
 
@@ -22,7 +21,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
             if (!userId) {
                 console.info("No saved credentials found. It's a fresh page!");
                 setRedirect(true);
-                setIsLoading(false);
                 return;
             }
 
@@ -36,16 +34,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
                     console.log('Api userApi.getUserData() catch 401 error!');
                 }
                 setRedirect(true);
-                setIsLoading(false);
             }
         };
 
         checkUser();
     }, [userData, setUserData]);
 
-    if (isLoading) {
-        return <div>Loading...</div>; // hoặc spinner nào đó
-    }
+    // if (isLoading) {
+    //     return <div>Loading...</div>; // hoặc spinner nào đó
+    // }
     
     if (redirect) {
         return <Navigate to="/" replace />;

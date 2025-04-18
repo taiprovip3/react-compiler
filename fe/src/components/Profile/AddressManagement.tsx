@@ -25,7 +25,7 @@ const AddressManagement = () => {
     }
     
     const renderDefaultAddressComponent = () => {
-        if(!userData?.profile.defaultAddress) {
+        if(!userData?.profile?.defaultAddress) {
             return <>
                 <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No default address" />
             </>;

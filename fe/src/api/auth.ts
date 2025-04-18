@@ -14,7 +14,7 @@ export const register = async (username: string, password: string): Promise<Regi
     return response.data;
 }
 
-export const logout = async (): Promise<any> => {
+export const logout = async (): Promise<object> => {
     const response = await http.post('/auth/logout');
     sessionStorage.removeItem('accessToken');
     sessionStorage.removeItem('userId');
