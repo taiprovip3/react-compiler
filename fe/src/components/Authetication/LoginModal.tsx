@@ -97,20 +97,19 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onRegister })
           name="loginForm"
           onFinish={handleLogin}
           initialValues={{ remember: true }}
+          autoComplete="on"
         >
           <Form.Item
             name="username"
             rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập!' }]}
-            initialValue={'user02'}
           >
-            <Input placeholder="Tên đăng nhập" ref={(input) => (usernameInputRef.current = input?.input || null)} />
+            <Input placeholder="Tên đăng nhập" autoComplete="username" ref={(input) => (usernameInputRef.current = input?.input || null)} />
           </Form.Item>
           <Form.Item
             name="password"
             rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
-            initialValue={'123123az'}
           >
-            <Input.Password placeholder="Mật khẩu" />
+            <Input.Password placeholder="Mật khẩu" autoComplete="password" />
           </Form.Item>
           <Form.Item name="remember" valuePropName="checked">
             <Checkbox>Ghi nhớ mật khẩu</Checkbox>
