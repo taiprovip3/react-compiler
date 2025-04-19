@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Layout, Menu } from "antd";
-import UserInfomation from "../../components/Profile/UserInfomation";
-import AddressManagement from "../../components/Profile/AddressManagement";
-import PasswordManagement from "../../components/Profile/PasswordManagement";
+import UserInfomation from "./UserInfomation";
+import AddressManagement from "./AddressManagement";
+import PasswordManagement from "./PasswordManagement";
 
 const { Content, Sider } = Layout;
 
@@ -22,10 +22,10 @@ const ProfilePage: React.FC = () => {
         style={{ height: '100vh' }}
         breakpoint="lg"
         collapsedWidth={0}
-        onBreakpoint={(broken) => {
+        onBreakpoint={(broken: any) => {
           console.log('broken=', broken);
         }}
-        onCollapse={(collapsed, type) => {
+        onCollapse={(collapsed: any, type: any) => {
           console.log(collapsed, type);
         }}
       >

@@ -1,0 +1,25 @@
+export enum CategoryType {
+    MAINBOARD = 'Mainboard',
+    CPU = 'Cpu',
+    RAM = 'Ram',
+    SSD = 'Ssd',
+    HDD = 'HDD',
+    VGA = 'Card VGA',
+    PSU = 'Nguồn',
+    HEATSINK = 'Tản nhiệt CPU',
+    CASE = 'Vỏ case',
+    MONITOR = 'Màn hình',
+    MOUSE = 'Chuột',
+    KEYBOARD = 'Bàn phím',
+    HEADPHONE = 'Tai nge',
+    SPEAKER = 'Loa',
+    CABLE = 'Dây cáp', // Cáp màn hình, cáp mạng, dây nguồn
+    FAN = 'Quạt tản nhiệt',
+    CARD_PCIE = 'Card', // Card wifi, card lan, card pcie, card usb,... 
+    TABLE = 'Bàn',
+    CHAIR = 'Ghế',
+    PAD = 'Lót chuột',
+    ARM = 'ARM màn hình',
+    ACCESSORY = 'Phụ kiện',
+    USB = 'USB',
+}

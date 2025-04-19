@@ -13,6 +13,7 @@ import { Token } from './token.entity';
 import { Authority } from './authority.entity';
 import { Exclude } from 'class-transformer';
 import { Profile } from './profile.entity';
+import { Post } from './post.entity';
 
 @Entity()
 export class User {
@@ -53,4 +54,7 @@ export class User {
 
   @OneToOne(() => Profile, (profile) => profile.user)
   profile: Profile;
+
+  @OneToMany(() => Post, (post) => post.owner)
+  posts: Post[];
 }
