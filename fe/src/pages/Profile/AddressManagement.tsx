@@ -3,10 +3,11 @@ import { useContext, useEffect, useState } from 'react'
 import AuthContext from '../../contexts/AuthContext';
 import { Address } from '../../types/Address';
 import { addressApi } from '../../api';
+import { useLoading } from '../../contexts/LoadingContext';
 
 const AddressManagement = () => {
     const { userData } = useContext(AuthContext);
-    
+    const { setIsLoading } = useLoading();
     const [messageApi, messageContextHolder] = message.useMessage();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [addresses, setAddresses] = useState<Address[]>([]);
@@ -20,8 +21,16 @@ const AddressManagement = () => {
     }, []);
 
     const getUserAddresses = async () => {
-        const addresses = await addressApi.getUserAddesses();
-        setAddresses(addresses);
+        try {
+            setIsLoading(true);
+            const addresses = await addressApi.getUserAddesses();
+            setAddresses(addresses);
+        } catch (error) {
+            console.error(error);
+            messageApi.error('(!) getUserAddresses catch an error. Please watch logs!');
+        } finally {
+            setIsLoading(false);
+        }
     }
     
     const renderDefaultAddressComponent = () => {
@@ -48,32 +57,48 @@ const AddressManagement = () => {
     };
 
     const handleSaveAddress = async (addressObj: Address) => {
-        if (editingAddress) { // Update existing address
-            const updateAddressObj = await addressApi.updateAddress(editingAddress.id, addressObj);
-            console.log('updateAddressObj=', updateAddressObj);
-            setAddresses((prev: any) =>
-                prev.map((addr: any) =>
-                    addr.id === editingAddress.id ? { ...editingAddress, ...addressObj } : addr
-                )
-            );
-            messageApi.success("Address updated successfully!");
-        } else { // Add new address
-            const createAddressObj = await addressApi.createAddress(addressObj);
-              setAddresses((prev: any) => [
-                ...prev,
-                createAddressObj,
-              ]);
-            messageApi.success("Address added successfully!");
+        try {
+            setIsLoading(true);
+            if (editingAddress) { // Update existing address
+                const updateAddressObj = await addressApi.updateAddress(editingAddress.id, addressObj);
+                console.log('updateAddressObj=', updateAddressObj);
+                setAddresses((prev: any) =>
+                    prev.map((addr: any) =>
+                        addr.id === editingAddress.id ? { ...editingAddress, ...addressObj } : addr
+                    )
+                );
+                messageApi.success("Address updated successfully!");
+            } else { // Add new address
+                const createAddressObj = await addressApi.createAddress(addressObj);
+                setAddresses((prev: any) => [
+                    ...prev,
+                    createAddressObj,
+                ]);
+                messageApi.success("Address added successfully!");
+            }
+        } catch (error) {
+            console.error(error);
+            messageApi.error('(!) handleSaveAddress catches an error. Please watch logs!');
+        } finally {
+            setIsModalVisible(false);
+            setEditingAddress(null);
+            setIsLoading(false);
         }
-        setIsModalVisible(false);
-        setEditingAddress(null);
     };
 
     const deleteAddress = async (addressId: number) => {
-        const deleteAddressResult = await addressApi.deleteAddress(addressId);
-        console.log('deleteAddressResult=', deleteAddressResult);
-        setAddresses((prev: any) => prev.filter((addr: any) => addr.id !== addressId));
-        messageApi.success("Address deleted successfully!");
+        try {
+            setIsLoading(true);
+            const deleteAddressResult = await addressApi.deleteAddress(addressId);
+            console.log('deleteAddressResult=', deleteAddressResult);
+            setAddresses((prev: any) => prev.filter((addr: any) => addr.id !== addressId));
+            messageApi.success("Address deleted successfully!");
+        } catch (error) {
+            console.error(error);
+            messageApi.error('(!) deleteAddress catches an error. Please watch logs!');
+        } finally {
+            setIsLoading(false);
+        }
     };
     
   return (

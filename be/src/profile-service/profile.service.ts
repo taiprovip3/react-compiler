@@ -74,7 +74,7 @@ export class ProfileService {
       : profile.dateOfBirth;
     profile.defaultAddress =
       updateProfileDto.defaultAddress ?? profile.defaultAddress;
-
+    profile.user = user;
     await this.profileRepository.save(profile);
     return {
       message: 'Cập nhật hồ sơ thành công',

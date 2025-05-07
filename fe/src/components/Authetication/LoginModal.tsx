@@ -4,6 +4,7 @@ import { AuthContext } from '../../contexts/AuthContext';
 import Swal from 'sweetalert2';
 import { authApi, userApi } from '../../api';
 import { jwtDecode } from 'jwt-decode';
+import { useLoading } from '../../contexts/LoadingContext';
 
 interface LoginModalProps {
   visible: boolean;
@@ -25,12 +26,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onRegister })
   const [form] = Form.useForm();
   const [messageApi, messageContextHolder] = message.useMessage();
   const [loading, setLoading] = React.useState<boolean>(false);
+  const { setIsLoading } = useLoading();
   const usernameInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const handleLogin = () => {
     form.validateFields().then(async (values: { username: string; password: string; }) => {
-      console.log('Login values:', values);
       setLoading(true);
+      setIsLoading(true);
       try {
         const loginResponse = await authApi.login(values.username, values.password);
   
@@ -38,8 +40,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onRegister })
           const accessToken = loginResponse.accessToken;
           const decoded = jwtDecode<JwtPayload>(accessToken);
           const userId = decoded.sub;
+          const username = decoded.username;
           sessionStorage.setItem('accessToken', accessToken);
           sessionStorage.setItem('userId', userId.toString());
+          sessionStorage.setItem('username', username);
           
           const userDataResponse = await userApi.getUserData(userId); // Gọi API lấy thông tin người dùng
           setUserData(userDataResponse);
@@ -72,6 +76,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onRegister })
         }
       } finally {
         setLoading(false);
+        setIsLoading(false);
       }
     });
   };

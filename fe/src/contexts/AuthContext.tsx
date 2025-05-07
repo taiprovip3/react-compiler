@@ -31,6 +31,7 @@ export const AuthProvider:React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const userId = sessionStorage.getItem('userId');
         if(!userId) {
+          sessionStorage.removeItem('username');
           console.info('No saved credentials found. It"s a fresh page!');
           return;
         }
@@ -44,6 +45,8 @@ export const AuthProvider:React.FC<AuthProviderProps> = ({ children }) => {
       } catch (error: any) {
         console.error(error);
         if(error.code === 'ERR_BAD_REQUEST') {
+          sessionStorage.removeItem('userId');
+          sessionStorage.removeItem('username');
           navigate('/');
         }
       }
@@ -52,7 +55,7 @@ export const AuthProvider:React.FC<AuthProviderProps> = ({ children }) => {
 
   React.useEffect(() => {
     validateUserAuthentication();
-  });
+  }, []);
 
   return (
     <AuthContext.Provider value={{ userData, setUserData, validateUserAuthentication }}>

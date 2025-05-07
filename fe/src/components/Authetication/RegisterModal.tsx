@@ -3,6 +3,7 @@ import { Button, Form, Input, Modal } from 'antd';
 import React from 'react';
 import Swal from 'sweetalert2';
 import { authApi } from '../../api';
+import { useLoading } from '../../contexts/LoadingContext';
 
 interface RegisterModalProps {
     visible: boolean;
@@ -13,11 +14,13 @@ interface RegisterModalProps {
 const RegisterModal: React.FC<RegisterModalProps> = ({ visible, onClose, onLogin }) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = React.useState<boolean>(false);
+    const { setIsLoading } = useLoading();
 
     const handleRegister = async (): Promise<void> => {
         try {
-            const values = await form.validateFields();
             setLoading(true);
+            setIsLoading(true);
+            const values = await form.validateFields();
             const registerResponse = await authApi.register(values.username, values.password);
             form.resetFields();
             Swal.fire({
@@ -39,6 +42,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ visible, onClose, onLogin
             });
         } finally {
             setLoading(false);
+            setIsLoading(false);
         }
     }
 
@@ -73,7 +77,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ visible, onClose, onLogin
                 >
                     <Input.Password
                         placeholder="Mật khẩu"
-                        iconRender={(visible) => visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />}
+                        iconRender={(visible: any) => visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />}
                     />
                 </Form.Item>
                 <Form.Item
@@ -94,7 +98,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ visible, onClose, onLogin
                 >
                     <Input.Password
                         placeholder="Xác nhận mật khẩu"
-                        iconRender={(visible) => visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />}
+                        iconRender={(visible: boolean) => visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />}
                     />
                 </Form.Item>
                 <Form.Item>

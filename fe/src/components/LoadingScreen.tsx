@@ -2,7 +2,6 @@ import { Spin } from 'antd';
 
 const LoadingScreen = () => {
   return (
-    
     <div style={{
       display: 'flex',
       alignItems: 'center',

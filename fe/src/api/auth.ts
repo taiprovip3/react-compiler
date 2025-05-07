@@ -18,6 +18,7 @@ export const logout = async (): Promise<object> => {
     const response = await http.post('/auth/logout');
     sessionStorage.removeItem('accessToken');
     sessionStorage.removeItem('userId');
+    sessionStorage.removeItem('username');
     console.log(response.data);
     return response.data;
 }

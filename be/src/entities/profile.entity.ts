@@ -10,6 +10,7 @@ import {
 import { Address } from './address.entity';
 import { User } from './user.entity';
 import { GenderType } from 'src/enums/gender.enum';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Profile {
@@ -45,5 +46,6 @@ export class Profile {
 
   @OneToOne(() => User, { cascade: true })
   @JoinColumn({ name: 'user_id' })
+  @Exclude()
   user: User;
 }

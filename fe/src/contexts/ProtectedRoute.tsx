@@ -19,6 +19,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
             const userId = sessionStorage.getItem('userId');
             if (!userId) {
+                sessionStorage.removeItem('username');
                 console.info("No saved credentials found. It's a fresh page!");
                 setRedirect(true);
                 return;
@@ -31,6 +32,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
             } catch (error: any) {// TH: bị 401 khi call api. Catch lại. TH này là do token {hết hạn, thiếu} khi gởi lên server -> 401
                 console.error('error', error);
                 if (error.response?.status === 401) {
+                    sessionStorage.removeItem('username');
                     console.log('Api userApi.getUserData() catch 401 error!');
                 }
                 setRedirect(true);

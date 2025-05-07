@@ -7,9 +7,12 @@ import AuthContext from "../../contexts/AuthContext";
 import Swal from "sweetalert2";
 import { profileApi } from "../../api";
 import { UploadProps } from "antd/es/upload";
+import { useLoading } from "../../contexts/LoadingContext";
 
 const UserInfomation = () => {
-  const { userData } = useContext(AuthContext);
+  const { userData, setUserData } = useContext(AuthContext);
+  console.log('UserInfomation-userData=', userData);
+  const { setIsLoading } = useLoading();
   const [messageApi, messageContextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const [modal, modalContextHolder] = Modal.useModal();
@@ -147,7 +150,6 @@ const UserInfomation = () => {
       return;
     }
 
-    messageApi.success("Cập nhật hồ sơ thành công!");
     console.log("Valid data:", values);
 
     const resultObject = {
@@ -161,7 +163,13 @@ const UserInfomation = () => {
     }
     
     try {
+      setIsLoading(true);
       const responseUpdateProfile = await profileApi.updateUserProfile(userData!.id, resultObject);
+      console.log('responseUpdateProfile=', responseUpdateProfile);
+      setUserData({
+        ...userData,
+        profile: responseUpdateProfile.profile,
+      });
       Swal.fire({
         title: "Update Profile",
         text: responseUpdateProfile.message,
@@ -174,6 +182,8 @@ const UserInfomation = () => {
         text: error?.response?.data?.message,
         icon: "error",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -183,6 +193,7 @@ const UserInfomation = () => {
     formData.append('file', file as any);
 
     try {
+      setIsLoading(true);
       const res = await profileApi.uploadAvatar(formData);
       const result = res.data;
       messageApi.success('Upload avatar thành công!');
@@ -191,6 +202,8 @@ const UserInfomation = () => {
       console.error('handleUploadAvatar catches error=', err);
       messageApi.error(err.message || 'Lỗi khi upload ảnh');
       onError(err)
+    } finally {
+      setIsLoading(false);
     }
   }
 

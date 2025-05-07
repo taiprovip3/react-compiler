@@ -9,7 +9,7 @@ const MainLayout = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <AppHeader />
-      <Content style={{ }}>
+      <Content>
         <Outlet /> {/* nơi render các page con */}
       </Content>
       <AppFooter />

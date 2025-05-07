@@ -30,6 +30,7 @@ const AppHeader: React.FC = () => {
   const [isLoginModalVisible, setLoginModalVisible] = React.useState<boolean>(false);
   const [isRegisterModalVisible, setRegisterModalVisible] = React.useState<boolean>(false);
   const { userData } = React.useContext(AuthContext);
+  
   const navigate = useNavigate();
   
   const onClick: MenuProps['onClick'] = ({ key }) => {
@@ -83,7 +84,7 @@ const AppHeader: React.FC = () => {
 
         {/* 3 */}
         <div style={{ width: '25%', textAlign: 'right' }}>
-          {
+          {/* {
             userData ? (
               <LoggedComponent />
             ) : (
@@ -93,6 +94,9 @@ const AppHeader: React.FC = () => {
                 <span>Login</span>
               </LoginDiv>
             )
+          } */}
+          {
+            <LoggedComponent openLoginModal={openLoginModal} />
           }
         </div>
         </Flex>

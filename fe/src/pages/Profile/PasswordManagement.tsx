@@ -1,13 +1,16 @@
 import { Input, Button, Form, Divider, message } from "antd";
 import { userApi } from "../../api";
 import { ChangePasswordDto } from "../../dto/change-password.dto";
+import { useLoading } from "../../contexts/LoadingContext";
 
 const PasswordManagement = () => {
+    const { setIsLoading } = useLoading();
     const [form] = Form.useForm();
     const [messageApi, messageContextHolder] = message.useMessage();
     
     const handleChangePassword = async (values: ChangePasswordDto): Promise<void> => {
         try {
+            setIsLoading(true);
             if(!values.currentPassword || !values.newPassword || !values.confirmNewPassword) {
                 messageApi.error('Vui lòng điền đủ thông tin các field!');
                 return;
@@ -29,8 +32,9 @@ const PasswordManagement = () => {
         } catch (error: any) {
             console.error('error==', error);
             messageApi.error(error?.response?.data?.message);
+        } finally {
+            setIsLoading(false);
         }
-
     }
 
     return (
