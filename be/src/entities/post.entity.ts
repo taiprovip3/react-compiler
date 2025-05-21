@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "./user.entity";
 import { CategoryType } from "src/enums/category.enum";
+import { PostImage } from "./post.image.entity";
 
 @Entity()
 export class Post {
@@ -28,4 +29,6 @@ export class Post {
     @ManyToOne(() => User, (user) => user.posts, { eager: true })
     @JoinColumn({ name: 'user_id' })
     owner: User;
+    @OneToMany(() => PostImage, (postImage) => postImage.post)
+    postImages: PostImage[];
 }

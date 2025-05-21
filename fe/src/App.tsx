@@ -25,7 +25,7 @@ const App: React.FC = () => {
                 <Route path="/" element={<Suspense fallback={<LoadingScreen />}><HomePage /></Suspense>} />
                 <Route path="/profile" element={<ProtectedRoute><Suspense fallback={<LoadingScreen />}><ProfilePage /></Suspense></ProtectedRoute>} />
                 <Route path="/verify-email" element={<Suspense fallback={<LoadingScreen />}><VerifyEmailPage /></Suspense>} />
-                <Route path="/wall" element={<WallPage />} />
+                <Route path="/wall" element={<ProtectedRoute><Suspense fallback={<LoadingScreen />}><WallPage /></Suspense></ProtectedRoute>} />
                 <Route path="/test" element={<LoadingScreen />} />
               </Route>
             </Routes>
