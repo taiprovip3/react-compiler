@@ -19,21 +19,19 @@ const WallPage: React.FC = () => {
   const [postDetailModalVisible, setPostDetailModalVisible] = React.useState<boolean>(false);
   const [editPostModalVisible, setEditPostModalVisible] = React.useState<boolean>(false);
   const [editingPost, setEditingPost] = React.useState<Post | null>(null);
-
-  
-  // const { setIsLoading } = useLoading();
+  const { isLoading, setIsLoading } = useLoading();
 
   React.useEffect(() => {
     const fetchPosts = async () => {
       try {
-        // setIsLoading(true);
+        setIsLoading(true);
         const postList = await postApi.getPosts(1);
         setPosts(postList);
       } catch (error) {
         console.error(error);
         setError('Lỗi khi tải dữ liệu bài viết');
       } finally {
-        // setIsLoading(false);
+        setIsLoading(false);
       }
     }
     fetchPosts();
@@ -72,7 +70,7 @@ const WallPage: React.FC = () => {
   };
 
   if (error) return <div style={{ textAlign: 'center', marginTop: 40 }}>{error}</div>;
-  // if (posts.length === 0) return <Empty description="Không có bài viết nào." style={{ marginTop: 80 }} />;
+  if (posts.length === 0 && !isLoading) return <Empty description="Không có bài viết nào." style={{ marginTop: 80 }} />;
 
   return (
     <div style={{ padding: '24px', background: '#f5f5f5', minHeight: '100vh' }}>
@@ -132,11 +130,13 @@ const WallPage: React.FC = () => {
         onDelete={handleDelete}
       />
 
-      <EditPostModal
-        open={editPostModalVisible}
-        post={editingPost}
-        onClose={handleEditPostModalClose}      
-      />
+      {editingPost && (
+        <EditPostModal
+          open={editPostModalVisible}
+          post={editingPost}
+          onClose={handleEditPostModalClose}
+        />
+      )}
     </div>
   );
 };

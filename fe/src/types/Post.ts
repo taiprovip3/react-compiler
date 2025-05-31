@@ -4,7 +4,7 @@ interface Owner {
     email: string;
 }
 
-interface PostImage {
+export interface PostImage {
     id: number;
     imageUrl: string;
     description: string;
