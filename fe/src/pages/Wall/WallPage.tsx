@@ -133,8 +133,8 @@ const WallPage: React.FC = () => {
       {editingPost && (
         <EditPostModal
           open={editPostModalVisible}
-          post={editingPost}
           onClose={handleEditPostModalClose}
+          post={editingPost}
         />
       )}
     </div>

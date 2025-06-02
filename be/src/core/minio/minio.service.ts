@@ -15,7 +15,7 @@ dotenv.config();
 @Injectable()
 export class MinioService {
   private s3Client: S3Client;
-  private readonly bucket = 'blog-db-avatars';
+  private readonly bucketName = 'taipc';
 
   constructor(private configService: ConfigService) {
     this.s3Client = new S3Client({
@@ -39,25 +39,25 @@ export class MinioService {
 
     await this.s3Client.send(
       new PutObjectCommand({
-        Bucket: this.bucket,
+        Bucket: this.bucketName,
         Key: key,
         Body: resizedImage,
         ContentType: file.mimetype,
       }),
     );
 
-    return `${this.configService.get<string>('MINIO_ENDPOINT')}/${this.bucket}/${key}`;
+    return `${this.configService.get<string>('MINIO_ENDPOINT')}/${this.bucketName}/${key}`;
   }
 
   async deleteAvatarByUrl(url: string) {
     try {
-      const key = url.split(`/${this.bucket}/`)[1];
+      const key = url.split(`/${this.bucketName}/`)[1];
       if (!key) {
         return;
       }
       await this.s3Client.send(
         new DeleteObjectCommand({
-          Bucket: this.bucket,
+          Bucket: this.bucketName,
           Key: key,
         }),
       );
@@ -67,5 +67,46 @@ export class MinioService {
         'Can"t delete avatar when delete avatar by URL!',
       );
     }
+  }
+
+  // Handle post image upload and delete (thumbnail & sub images)
+  async deletePostImage(fileUrl: string): Promise<void> {
+    const key = fileUrl.split('/').pop();
+    if (!key) return;
+
+    const command = new DeleteObjectCommand({
+      Bucket: this.bucketName,
+      Key: key,
+    });
+
+    await this.s3Client.send(command);
+  }
+
+  async uploadPostImage(file: Express.Multer.File): Promise<string> {
+    const ext = extname(file.originalname);
+    const key = `post_${uuidv4()}${ext}`;
+
+    const command = new PutObjectCommand({
+      Bucket: this.bucketName,
+      Key: key,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    });
+
+    await this.s3Client.send(command);
+
+    return `${this.configService.get<string>('MINIO_ENDPOINT')}/${this.bucketName}/${key}`;
+  }
+
+  // Post images
+  async uploadMultipleFiles(files: Express.Multer.File[]): Promise<string[]> {
+    const urls: string[] = [];
+
+    for (const file of files) {
+      const url = await this.uploadPostImage(file);
+      urls.push(url);
+    }
+
+    return urls;
   }
 }

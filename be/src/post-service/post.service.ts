@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { MinioService } from "src/core/minio/minio.service";
 import { Post } from "src/entities/post.entity";
+import { PostImage } from "src/entities/post.image.entity";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -8,6 +10,9 @@ export class PostService {
     constructor(
         @InjectRepository(Post)
         private readonly postRepository: Repository<Post>,
+        @InjectRepository(PostImage)
+        private readonly postImageRepository: Repository<PostImage>,
+        private readonly minioService: MinioService,
     ) {}
 
     async getUserPosts(userId: number): Promise<Post[]> {
@@ -41,5 +46,30 @@ export class PostService {
         }
 
         return { message: 'Post deleted successfully' };
+    }
+
+    async uploadThumbnailImage(postId: number, oldThumbnailUrl: string, file: Express.Multer.File): Promise<Post | null> {
+        if (oldThumbnailUrl) {
+            await this.minioService.deletePostImage(oldThumbnailUrl);
+        }
+
+        const newUrl = await this.minioService.uploadPostImage(file);
+        await this.postRepository.update(postId, { thumbnailUrl: newUrl });
+
+        return this.postRepository.findOne({ where: { id: postId } });
+    }
+
+    async uploadSubImages(postId: number, files: Express.Multer.File[]): Promise<PostImage[]> {
+        const urls = await this.minioService.uploadMultipleFiles(files);
+
+        const entities = urls.map((url, index) =>
+            this.postImageRepository.create({
+                post: { id: postId },
+                description: `Sub image ${index + 1}`,
+                imageUrl: url,
+            }),
+        );
+
+        return await this.postImageRepository.save(entities);
     }
 }
